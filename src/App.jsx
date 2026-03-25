@@ -1,6 +1,7 @@
 import './index.css'
 import cImage from './assets/c.png'
 import { useState } from 'react';
+import Ceva,{Test2,Test3} from './components/test_comp.jsx'
 
 function App() {
     function Square({value,onSquareClick}) {
@@ -118,8 +119,9 @@ function App() {
         }
         return null;
     }
-
-
+    function Person(){
+        return <Test3 aa={'test'} bb={'ceva'}/>;
+    }
     return (
         <>
         <div className="min-h-screen flex justify-center items-center">
@@ -148,7 +150,9 @@ function App() {
                 <br/>
                 <Game></Game>
 
-
+                <Ceva/>
+                <Test2/>
+                <Person/>
             </div>
 
         </div>

@@ -85,7 +85,7 @@ function App() {
             }
             return (
                 <li key={move}>
-                    <button onClick={() => jumpTo(move)}>{description}</button>
+                    <button onClick={() => jumpTo(move)}>{calculateWinner(squares) ? 'Winner move' : description}</button>
                 </li>
             );
         });
@@ -122,6 +122,20 @@ function App() {
     function Person(){
         return <Test3 aa={'test'} bb={'ceva'}/>;
     }
+    function Lista(){
+        const people=[
+            'Creola Katherine Johnson: mathematician',
+            'Mario José Molina-Pasquel Henríquez: chemist',
+            'Mohammad Abdus Salam: physicist',
+            'Percy Lavon Julian: chemist',
+            'Subrahmanyan Chandrasekhar: astrophysicist'
+        ];
+        const per = people.filter(person => person.toLowerCase().includes('chemist'));
+        for (let i = 0; i < per.length; i++) {
+            per[i]=<li key={i}>{per[i]}</li>;
+        }
+        return <ul>{per}</ul>;
+    }
     return (
         <>
         <div className="min-h-screen flex justify-center items-center">
@@ -153,6 +167,7 @@ function App() {
                 <Ceva/>
                 <Test2/>
                 <Person/>
+                <Lista/>
             </div>
 
         </div>

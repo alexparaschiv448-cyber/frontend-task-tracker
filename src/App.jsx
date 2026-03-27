@@ -2,6 +2,10 @@ import './index.css'
 import cImage from './assets/c.png'
 import { useState } from 'react';
 import Ceva,{Test2,Test3} from './components/test_comp.jsx'
+import { useRef } from 'react';
+import { useEffect } from 'react';
+import Final from './components/Final.jsx'
+import Request from './components/request_final.jsx'
 
 function App() {
     function Square({value,onSquareClick}) {
@@ -136,6 +140,21 @@ function App() {
         }
         return <ul>{per}</ul>;
     }
+    function Reference(){
+        let ref=useRef(null);
+        function focus1(){
+            ref.current.focus();
+        }
+        return(
+            <>
+            <input ref={ref}/>
+                <button onClick={focus1}>Focus</button>
+            </>
+        )
+    }
+
+    //const [isPlaying, setIsPlaying] = useState(false);
+    //let isPlaying=useRef(false);
     return (
         <>
         <div className="min-h-screen flex justify-center items-center">
@@ -162,12 +181,14 @@ function App() {
                 <br/>
                 <br/>
                 <br/>
-                <Game></Game>
+                <Game className="mx-auto"></Game>
 
                 <Ceva/>
                 <Test2/>
                 <Person/>
                 <Lista/>
+                <Reference/>
+                <Request/>
             </div>
 
         </div>

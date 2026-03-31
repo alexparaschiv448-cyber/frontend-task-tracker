@@ -8,7 +8,7 @@ export default function RegisterForm() {
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     console.log("First name: ",firstName);
     console.log("Last name: ",lastName);
@@ -52,11 +52,12 @@ export default function RegisterForm() {
     }
     useEffect(() => {
         async function checkEmail() {
+
             try {
                 const response = await fetch(
                     "http://localhost:8000/checkemail/"+email
                 );
-
+                //console.log(response);
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -69,13 +70,52 @@ export default function RegisterForm() {
                 setLoading(false);
             }
         }
-        checkEmail();
+        //checkEmail();
+        const timer = setTimeout(() => {
+            if (email) checkEmail();
+        }, 500);
+        const controller = new AbortController();
+        return () => {
+            clearTimeout(timer);
+            controller.abort();
+        };
     }, [email]);
     function handleClick(){
         if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data.length===0){
-            alert("Yes");
+            //alert("Yes");
+            setLoading(true);
+            const sendPostRequest = async () => {
+                try {
+                    const response = await fetch("http://localhost:8000/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            firstName: firstName,
+                            lastName: lastName,
+                            email: email,
+                            passwordHash: password
+                        }),
+                    });
+
+                    //const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error("Error creating user!");
+                    }
+                    alert("User successfully registered!");
+                    nav("/");
+                    //setData(result);
+                } catch (error) {
+                    //console.error("Error:", error);
+                    alert(error);
+                }finally {
+                    setLoading(false);
+                }
+            };
+            sendPostRequest();
         }else{
-            alert("No");
+            alert("Invalid data");
         }
 
         //nav("/");
@@ -87,22 +127,24 @@ export default function RegisterForm() {
                 <br/>
                 <br/>
                 <br/>
-                <Input value={firstName} text={"First Name"} handleChange={(e) => setFirstName(e.target.value)}/>
+                <Input value={firstName} text={"First Name"} handleChange={(e) => setFirstName(e.target.value)} type={"text"}/>
                 {validateName(firstName) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                     {validateName(firstName)}
                 </p> :<br/>}
-                <Input value={lastName} text={"Last Name"} handleChange={(e) => setLastName(e.target.value)}/>
+                <Input value={lastName} text={"Last Name"} handleChange={(e) => setLastName(e.target.value)} type={"text"}/>
                 {validateName(lastName) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                     {validateName(lastName)}
                 </p> :<br/>}
-                <Input value={email} text={"Email address"} handleChange={(e) => setEmail(e.target.value)}/>
+                <Input value={email} text={"Email address"} handleChange={(e) => setEmail(e.target.value)} type={"text"}/>
                 {validateEmail(email) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                         {validateEmail(email)}</p> : <br/>}
-                <Input value={password} text={"Password"} handleChange={(e) => setPassword(e.target.value)}/>
+                <Input value={password} text={"Password"} handleChange={(e) => setPassword(e.target.value)} type={"password"}/>
                 {validatePassword(password) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                     {validatePassword(password)}</p> : <br/>}
                 <button type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>
+                {loading ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">Loading</p>:<br/>}
             </form>
+
         </>
     )
 }

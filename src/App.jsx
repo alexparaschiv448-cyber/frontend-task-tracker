@@ -9,6 +9,7 @@ import ErrorWrapper from "./components/ErrorWraper.jsx";
 import {useState, createContext, useContext,Provider} from 'react';
 import Context from "./components/Context.jsx";
 import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
 
 export default function App() {
     return (
@@ -19,6 +20,7 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<Dashboard/>}/>
                     <Route path="/register" element={<Register/>}/>
+                    <Route path="/login" element={<Login/>}/>
                     <Route path="/error" element={<ErrorWrapper><Error /></ErrorWrapper>} />
                     <Route path="/test" element={<ConditionalRoute><Page/></ConditionalRoute>} />
                     <Route path="*" element={<ErrorWrapper><Error /></ErrorWrapper>} />

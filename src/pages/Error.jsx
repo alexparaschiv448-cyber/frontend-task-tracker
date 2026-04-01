@@ -7,7 +7,7 @@ export default function Error() {
     return(
         <>
                 <PageLayout>
-                    <h1>EROAREEEEEEEE</h1>
+                    <h1>404 page not found</h1>
                 </PageLayout>
         </>
     )

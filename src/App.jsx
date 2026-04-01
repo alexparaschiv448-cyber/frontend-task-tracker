@@ -10,6 +10,8 @@ import {useState, createContext, useContext,Provider} from 'react';
 import Context from "./components/Context.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
+import AuthCheck from "./components/AuthCheck.jsx";
+import Profile from "./pages/Profile.jsx";
 
 export default function App() {
     return (
@@ -19,11 +21,13 @@ export default function App() {
 
                 <Routes>
                     <Route path="/" element={<Dashboard/>}/>
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/register" element={<AuthCheck> <Register/> </AuthCheck>}/>
+                    <Route path="/login" element={<AuthCheck> <Login/> </AuthCheck>}/>
                     <Route path="/error" element={<ErrorWrapper><Error /></ErrorWrapper>} />
                     <Route path="/test" element={<ConditionalRoute><Page/></ConditionalRoute>} />
+                    <Route path="/me" element={<AuthCheck><Profile /></AuthCheck>} />
                     <Route path="*" element={<ErrorWrapper><Error /></ErrorWrapper>} />
+
                 </Routes>
 
             </BrowserRouter>

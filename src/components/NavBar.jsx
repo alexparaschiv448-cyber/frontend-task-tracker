@@ -1,0 +1,51 @@
+import {Navigate,useNavigate,useLocation} from "react-router-dom";
+import NavButton from "./NavButton";
+import {context} from "./Context.jsx";
+import {useContext, useState,useEffect} from "react";
+import Toast from "./Toast";
+
+export default function NavBar(){
+    let name='';
+    let email='';
+    const {a,b,c}=useContext(context);
+    const [message,setMessage]=b;
+    const [status,setStatus]=c;
+    let nav=useNavigate();
+    const Location=useLocation();
+    useEffect(() => {
+        setMessage("");
+        setStatus("");
+    }, [location.pathname]);
+    if(sessionStorage.getItem("name")  && sessionStorage.getItem("email")){
+        name=sessionStorage.getItem("name")
+        email=sessionStorage.getItem("email");
+    }
+    console.log("Status: "+!!status);
+    return(
+        <>
+            <div className="w-full h-[7vh] bg-blue-900 flex items-center justify-between px-6">
+
+                {/* Left side buttons */}
+                <div className="flex space-x-3">
+                    <Toast type={status} message={message}  show={!!status}/>
+                    <NavButton clickHandler={()=>{nav("/");}} text="Dashboard"/>
+                    <NavButton clickHandler={()=>{nav("/register");}} text="Register"/>
+                    <NavButton clickHandler={()=>{nav("/login");}} text="Login"/>
+                    <NavButton clickHandler={()=>{setMessage("Successfully logged out!");setStatus("success");console.log(status);
+                        setTimeout(() => {
+                            sessionStorage.removeItem("name");sessionStorage.removeItem("email");sessionStorage.removeItem("authorization");setMessage("");setStatus("");console.log(status);nav("/login");
+                        }, 2000);
+                    }} text="Logout"/>
+                    <NavButton clickHandler={()=>{nav("/me");}} text="Profile"/>
+                </div>
+
+                <div className="text-right text-white">
+                    <p className="font-semibold">{name}</p>
+                    <p className="text-sm text-blue-200">{email}</p>
+                </div>
+
+            </div>
+        </>
+    )
+
+}

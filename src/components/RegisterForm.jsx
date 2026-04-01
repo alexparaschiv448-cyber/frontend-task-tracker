@@ -1,6 +1,8 @@
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect, useState, useContext} from 'react';
 import {useNavigate} from "react-router-dom";
 import Input from './Input';
+import Toast from './Toast';
+import {context} from "./Context.jsx";
 export default function RegisterForm() {
     const nav=useNavigate();
     const[firstName, setFirstName] = useState('');
@@ -10,6 +12,15 @@ export default function RegisterForm() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const {a,b,c}=useContext(context);
+    const [message,setMessage]=b;
+    const [status,setStatus]=c;
+    const [disabled,setDisabled]=useState(false);
+
+    function statusMessage(m,s){
+        setMessage(m);
+        setStatus(s);
+    }
     console.log("First name: ",firstName);
     console.log("Last name: ",lastName);
     console.log(email.length);
@@ -23,9 +34,9 @@ export default function RegisterForm() {
 
             if (
                 !(char >= 'a' && char <= 'z') &&
-                !(char >= 'A' && char <= 'Z') && (char!==' ')
+                !(char >= 'A' && char <= 'Z') && (char===' ')
             ) {
-                return "No symbols or numbers!";
+                return "No symbols, spaces or numbers!";
             }
         }
         return false;
@@ -99,13 +110,25 @@ export default function RegisterForm() {
                         }),
                     });
 
-                    //const result = await response.json();
+                    const result = await response.json();
                     if (!response.ok) {
                         throw new Error("Error creating user!");
                     }
-                    alert("User successfully registered!");
-                    nav("/");
+                    //alert("User successfully registered!");
+                    //nav("/");
                     //setData(result);
+                    setLoading(false);
+                    setData(true);
+                    setMessage("User successfully registered!");
+                    setStatus("success");
+                    console.log("tee");
+                    setTimeout(() => {
+                        setMessage("");setStatus("");console.log("tee2");
+                        sessionStorage.setItem("name",result.firstname+" "+result.lastname);
+                        sessionStorage.setItem("email",result.email);
+                        sessionStorage.setItem("authorization",result.token);
+                        nav("/");
+                    }, 2000);
                 } catch (error) {
                     //console.error("Error:", error);
                     alert(error);
@@ -114,12 +137,22 @@ export default function RegisterForm() {
                 }
             };
             sendPostRequest();
+            //setStatus("error");
+            //setMessage("Invalid data!");
+            //console.log(status+" "+message);
+
         }else{
-            alert("Invalid data");
+            console.log("tee");
+            setMessage("Invalid data!");
+            setStatus("error");
+            setTimeout(() => {
+                setMessage("");setStatus("");
+            }, 3000);
         }
 
         //nav("/");
     }
+
     return (
         <>
             <form onSubmit={(e) => e.preventDefault()}>
@@ -141,7 +174,7 @@ export default function RegisterForm() {
                 <Input value={password} text={"Password"} handleChange={(e) => setPassword(e.target.value)} type={"password"}/>
                 {validatePassword(password) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                     {validatePassword(password)}</p> : <br/>}
-                <button type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>
+                <button disabled={disabled} type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>
                 {loading ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">Loading</p>:<br/>}
             </form>
 

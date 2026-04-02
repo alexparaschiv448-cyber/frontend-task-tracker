@@ -6,6 +6,7 @@ import Context, {context} from "../components/Context.jsx";
 import PageHeader from "../components/PageLayout.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import {useNavigate} from "react-router-dom";
+import {user_context} from "../components/AuthCheck.jsx";
 
 
 export default function Dashboard() {
@@ -16,6 +17,9 @@ export default function Dashboard() {
     const [error, setError] = useState(null);
     const nav=useNavigate();
     const {a,b,c}=useContext(context);
+    const {na,em}=useContext(user_context);
+    const [name,setName]=na;
+    const[email, setEmail] = em;
     const [message,setMessage]=b;
     const [status,setStatus]=c;
 
@@ -45,8 +49,10 @@ export default function Dashboard() {
                 //nav("/");
                 //setData(result);
                 sessionStorage.setItem("authorization", result.token);
-                sessionStorage.setItem("name", result.firstname+" "+result.lastname);
-                sessionStorage.setItem("email", result.email);
+                //sessionStorage.setItem("name", result.firstname+" "+result.lastname);
+                //sessionStorage.setItem("email", result.email);
+                setName(result.firstname+" "+result.lastname);
+                setEmail(result.email);
 
             } catch (error) {
                 //console.error("Error:", error);
@@ -74,10 +80,12 @@ export default function Dashboard() {
                 result = await response.json().catch(() => ({}));
                 if (response.status === 401 && result.detail==="Token Expired") {
                     alert(result.detail);
-                    sessionStorage.removeItem("authorization");
-                    sessionStorage.removeItem("name");
-                    sessionStorage.removeItem("email");
-                    nav("/register");
+                    sessionStorage.clear();
+                    setName("");
+                    setEmail("");
+                    //sessionStorage.removeItem("name");
+                    //sessionStorage.removeItem("email");
+                    nav("/login");
                 }
             }catch(error){
                 console.error("Error:", error);
@@ -90,14 +98,15 @@ export default function Dashboard() {
             <PageLayout>
                 <button onClick={HandleClick}>Set test</button>
                 <br/>
-                <button onClick={()=>{if( sessionStorage.getItem("authorization")){sessionStorage.removeItem("authorization")}
-                    if(sessionStorage.getItem("name")){sessionStorage.removeItem("name")}
-                    if(sessionStorage.getItem("email")){sessionStorage.removeItem("email")}setLoading(false);
+                <button onClick={()=>{sessionStorage.clear();
+                    setName("");
+                    setEmail("");
+                    setLoading(false);
                 }}>Remove test</button>
                 <br/>
                 <button onClick={CheckAuth}>Check test</button>
-                <h1>User is: {sessionStorage.getItem("name")? sessionStorage.getItem("name"):''}</h1>
-                {sessionStorage.getItem("name") ? <h1>Welcome {sessionStorage.getItem("name")}!</h1> : <h1>Welcome guest!</h1>}
+                <h1>User is: {name? name:''}</h1>
+                {name ? <h1>Welcome {name}!</h1> : <h1>Welcome guest!</h1>}
             </PageLayout>
         </>
     )

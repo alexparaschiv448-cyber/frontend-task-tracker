@@ -11,6 +11,9 @@ export default function LoginForm() {
     const nav=useNavigate();
     const[firstName, setFirstName] = useState('');
     const[lastName, setLastName] = useState('');
+    const [name1,setName1]=useState("");
+    const [email1,setEmail1]=useState("");
+
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
     const [data, setData] = useState(null);
@@ -41,6 +44,7 @@ export default function LoginForm() {
         return false;
     }
     function handleClick(){
+        setDisabled(true);
         if(!validateEmail(email) && !validatePassword(password) &&  email!=='' && password!=='') {
             //alert("Yes");
             setLoading(true);
@@ -57,7 +61,8 @@ export default function LoginForm() {
                         }),
                     });
 
-                    const result = await response.json();
+                    const result = await response.json().catch(() => ({}));
+                    //console.log("RESPONSE: "+response.json());
                     if (!response.ok) {
                         throw new Error("Error");
                     }
@@ -66,7 +71,7 @@ export default function LoginForm() {
                     //setData(result);
                     setLoading(false);
 
-                    console.log(result);
+                    console.log("Rezultat:",result.token);
                     if('message' in result){
                         console.log("tee");
                         setMessage("Invalid data!");
@@ -79,12 +84,19 @@ export default function LoginForm() {
                         setStatus("success");
                         setTimeout(() => {
                             setMessage("");setStatus("");console.log("tee2");
-                            sessionStorage.setItem("name",result.firstname+" "+result.lastname);
-                            sessionStorage.setItem("email",result.email);
+
+                            //setName(result.firstname+" "+result.lastname);
+                            //setEmail(result.email);
                             sessionStorage.setItem("authorization",result.token);
+                            //setName1(result.firstname+" "+result.lastname)
+                            //setEmail1(result.email);
+                            //sessionStorage.setItem("name",result.firstname+" "+result.lastname);
+                            //sessionStorage.setItem("email",result.email);
+                            console.log("AUTH: "+sessionStorage.getItem("authorization"));
                             nav("/");
                         }, 2000);
                     }
+
                 } catch (error) {
                     //console.error("Error:", error);
                     alert(error);
@@ -101,6 +113,7 @@ export default function LoginForm() {
                 setMessage("");setStatus("");
             }, 3000);
         }
+        setDisabled(false);
     }
     return(
         <>

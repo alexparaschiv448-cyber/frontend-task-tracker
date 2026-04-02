@@ -16,17 +16,19 @@ import Profile from "./pages/Profile.jsx";
 export default function App() {
     return (
         <>
+
         <Context>
             <BrowserRouter>
 
                 <Routes>
-                    <Route path="/" element={<Dashboard/>}/>
-                    <Route path="/register" element={<AuthCheck> <Register/> </AuthCheck>}/>
-                    <Route path="/login" element={<AuthCheck> <Login/> </AuthCheck>}/>
-                    <Route path="/error" element={<ErrorWrapper><Error /></ErrorWrapper>} />
+
+                    <Route path="/" element={<AuthCheck><Dashboard/></AuthCheck>}/>
+                    <Route path="/register" element={ <AuthCheck><Register/> </AuthCheck>}/>
+                    <Route path="/login" element={<AuthCheck><Login/> </AuthCheck>}/>
+                    <Route path="/error" element={<AuthCheck><Error /></AuthCheck>} />
                     <Route path="/test" element={<ConditionalRoute><Page/></ConditionalRoute>} />
                     <Route path="/me" element={<AuthCheck><Profile /></AuthCheck>} />
-                    <Route path="*" element={<ErrorWrapper><Error /></ErrorWrapper>} />
+                    <Route path="*" element={<AuthCheck><Error /></AuthCheck>} />
 
                 </Routes>
 

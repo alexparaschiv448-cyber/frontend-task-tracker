@@ -3,23 +3,29 @@ import NavButton from "./NavButton";
 import {context} from "./Context.jsx";
 import {useContext, useState,useEffect} from "react";
 import Toast from "./Toast";
+import {user_context} from "./AuthCheck.jsx";
 
 export default function NavBar(){
-    let name='';
-    let email='';
+    //let name='';
+    //let email='';
+    const {na,em}=useContext(user_context);
+    const [name,setName]=na;
+    const[email, setEmail] = em;
     const {a,b,c}=useContext(context);
     const [message,setMessage]=b;
     const [status,setStatus]=c;
     let nav=useNavigate();
     const Location=useLocation();
+
+
     useEffect(() => {
         setMessage("");
         setStatus("");
     }, [location.pathname]);
-    if(sessionStorage.getItem("name")  && sessionStorage.getItem("email")){
-        name=sessionStorage.getItem("name")
-        email=sessionStorage.getItem("email");
-    }
+    //if(sessionStorage.getItem("name")  && sessionStorage.getItem("email")){
+    //    name=sessionStorage.getItem("name")
+    //    email=sessionStorage.getItem("email");
+   // }
     console.log("Status: "+!!status);
     return(
         <>
@@ -31,9 +37,21 @@ export default function NavBar(){
                     <NavButton clickHandler={()=>{nav("/");}} text="Dashboard"/>
                     <NavButton clickHandler={()=>{nav("/register");}} text="Register"/>
                     <NavButton clickHandler={()=>{nav("/login");}} text="Login"/>
-                    <NavButton clickHandler={()=>{setMessage("Successfully logged out!");setStatus("success");console.log(status);
+                    <NavButton clickHandler={()=>{
+                        setMessage("Successfully logged out!");
+                        setStatus("success");console.log(status);
+
+
+                            //setName("");setEmail("");
+
+                            //setMessage("");
+                            //setStatus("");
+                            console.log(status);
                         setTimeout(() => {
-                            sessionStorage.removeItem("name");sessionStorage.removeItem("email");sessionStorage.removeItem("authorization");setMessage("");setStatus("");console.log(status);nav("/login");
+                            setMessage("");
+                            setStatus("");
+                            sessionStorage.clear();
+                            nav("/login");
                         }, 2000);
                     }} text="Logout"/>
                     <NavButton clickHandler={()=>{nav("/me");}} text="Profile"/>

@@ -3,8 +3,10 @@ import {useNavigate} from "react-router-dom";
 import Input from './Input';
 import Toast from './Toast';
 import {context} from "./Context.jsx";
+import {user_context} from "./AuthCheck.jsx";
 export default function RegisterForm() {
     const nav=useNavigate();
+
     const[firstName, setFirstName] = useState('');
     const[lastName, setLastName] = useState('');
     const[email, setEmail] = useState('');
@@ -124,8 +126,9 @@ export default function RegisterForm() {
                     console.log("tee");
                     setTimeout(() => {
                         setMessage("");setStatus("");console.log("tee2");
-                        sessionStorage.setItem("name",result.firstname+" "+result.lastname);
-                        sessionStorage.setItem("email",result.email);
+                        setDisabled(true);
+                        //sessionStorage.setItem("name",result.firstname+" "+result.lastname);
+                        //sessionStorage.setItem("email",result.email);
                         sessionStorage.setItem("authorization",result.token);
                         nav("/");
                     }, 2000);

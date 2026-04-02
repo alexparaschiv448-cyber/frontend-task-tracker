@@ -7,6 +7,7 @@ import PageHeader from "../components/PageLayout.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import {useNavigate} from "react-router-dom";
 import {user_context} from "../components/AuthCheck.jsx";
+import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 
 export default function Dashboard() {
@@ -93,6 +94,19 @@ export default function Dashboard() {
         }
         check();
     }
+    async function CheckFetch(){
+        const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fyJmaXJzdG5hbWUiOiJhbGV4IiwibGFzdG5hbWUiOiJwYXJhc2NoaXYiLCJlbWFpbCI6ImFsZXhAeWFob28uY29tIiwiZXhwIjoxNzc1MTM2NzM5fQ.dNtLm2JoMOm1tmSIpxXqYM-_WwleFVdr-VJZhNkXIt8";
+        const result= await FetchWrapper("http://localhost:8000/me",
+            "POST",
+            {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
+            {
+                authorization: token
+            }
+            )
+        console.log(result);
+        const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
+        console.log(result2);
+    }
     return(
         <>
             <PageLayout>
@@ -105,6 +119,10 @@ export default function Dashboard() {
                 }}>Remove test</button>
                 <br/>
                 <button onClick={CheckAuth}>Check test</button>
+                <br/>
+                <br/>
+                <br/>
+                <button onClick={CheckFetch}>Check fetch wrapper</button>
                 <h1>User is: {name? name:''}</h1>
                 {name ? <h1>Welcome {name}!</h1> : <h1>Welcome guest!</h1>}
             </PageLayout>

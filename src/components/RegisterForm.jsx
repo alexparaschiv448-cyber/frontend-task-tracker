@@ -67,7 +67,7 @@ export default function RegisterForm() {
     useEffect(() => {
         async function checkEmail() {
             const r= await FetchWrapper("http://localhost:8000/checkemail/"+email);
-            setData(Object.values(r.result.message));
+            setData(r.result.unique);
 
         }
         //checkEmail();
@@ -81,7 +81,7 @@ export default function RegisterForm() {
         };
     }, [email]);
     function handleClick(){
-        if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data.length===0){
+        if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data){
             //alert("Yes");
             setLoading(true);
             const sendPostRequest = async () => {

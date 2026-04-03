@@ -4,6 +4,7 @@ import Input from './Input';
 import Toast from './Toast';
 import {context} from "./Context.jsx";
 import {user_context} from "./AuthCheck.jsx";
+import FetchWrapper from "../assets/FetchWrapper.jsx"
 export default function RegisterForm() {
     const nav=useNavigate();
 
@@ -65,23 +66,9 @@ export default function RegisterForm() {
     }
     useEffect(() => {
         async function checkEmail() {
+            const r= await FetchWrapper("http://localhost:8000/checkemail/"+email);
+            setData(Object.values(r.result.message));
 
-            try {
-                const response = await fetch(
-                    "http://localhost:8000/checkemail/"+email
-                );
-                //console.log(response);
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-
-                const json = await response.json();
-                setData(Object.values(json.message));
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
         }
         //checkEmail();
         const timer = setTimeout(() => {
@@ -99,23 +86,17 @@ export default function RegisterForm() {
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const response = await fetch("http://localhost:8000/auth/register", {
-                        method: "POST",
-                        headers: {
+                    const r=await FetchWrapper("http://localhost:8000/auth/register",
+                        "POST",
+                        {
                             "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
+                        },{
                             firstName: firstName,
                             lastName: lastName,
                             email: email,
                             passwordHash: password
-                        }),
-                    });
+                        });
 
-                    const result = await response.json();
-                    if (!response.ok) {
-                        throw new Error("Error creating user!");
-                    }
                     //alert("User successfully registered!");
                     //nav("/");
                     //setData(result);
@@ -129,7 +110,7 @@ export default function RegisterForm() {
                         setDisabled(true);
                         //sessionStorage.setItem("name",result.firstname+" "+result.lastname);
                         //sessionStorage.setItem("email",result.email);
-                        sessionStorage.setItem("authorization",result.token);
+                        sessionStorage.setItem("authorization",r.result.token);
                         nav("/");
                     }, 2000);
                 } catch (error) {

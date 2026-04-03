@@ -1,6 +1,7 @@
 import {Navigate,useNavigate,useLocation} from "react-router-dom";
 import {useEffect, useContext, createContext, useState} from "react";
 import {context} from "./Context.jsx";
+import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 export const user_context = createContext(null);
 
@@ -24,35 +25,29 @@ export default function AuthCheck({children}){
         if(sessionStorage.getItem("authorization")) {
             console.log("Test2");
             async function check() {
-                try {
-                    response = await fetch("http://localhost:8000/me", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                        },
-                        body: JSON.stringify({
-                            authorization: sessionStorage.getItem("authorization"),
-                        }),
-                    });
-                    result = await response.json().catch(() => ({}));
-                    console.log(result);
-                    if (response.status===401) {
-                            //setStatus(401);
+                const r= await FetchWrapper("http://localhost:8000/me",
+                    "POST",
+                    {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
+                },{
+                    authorization: sessionStorage.getItem("authorization"),
+                });
+                console.log(result);
+                if (r.status===401) {
+                        //setStatus(401);
 
-                            //setEmail("");
-                            //setName("");
-                            sessionStorage.clear();
-                            nav("/login");
-                            //alert("Unauthorized! Login to access!");
-                    }else{
-                        setName(result.firstname+" "+result.lastname);
-                        setEmail(result.email);
-                        console.log("DATA SET");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
+                        //setEmail("");
+                        //setName("");
+                        sessionStorage.clear();
+                        nav("/login");
+                        //alert("Unauthorized! Login to access!");
+                }else{
+                    setName(r.result.firstname+" "+r.result.lastname);
+                    setEmail(r.result.email);
+                    console.log("DATA SET");
                 }
+
             }
 
             check();

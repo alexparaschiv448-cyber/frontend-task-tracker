@@ -95,7 +95,7 @@ export default function Dashboard() {
         check();
     }
     async function CheckFetch(){
-        const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fyJmaXJzdG5hbWUiOiJhbGV4IiwibGFzdG5hbWUiOiJwYXJhc2NoaXYiLCJlbWFpbCI6ImFsZXhAeWFob28uY29tIiwiZXhwIjoxNzc1MTM2NzM5fQ.dNtLm2JoMOm1tmSIpxXqYM-_WwleFVdr-VJZhNkXIt8";
+        const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.myJmaXJzdG5hbWUiOiJBbGV4IiwibGFzdG5hbWUiOiJQIiwiZW1haWwiOiJhbGV4QHlhaG9vLmNvbSIsImV4cCI6MTc3NTE5OTY5OX0.957gK1UviXzG9O8RwEfGGlzn0Hlv8ikWatTMsfu2vJw";
         const result= await FetchWrapper("http://localhost:8000/me",
             "POST",
             {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
@@ -103,9 +103,11 @@ export default function Dashboard() {
                 authorization: token
             }
             )
-        console.log(result);
+        //console.log(result);
         const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
-        console.log(result2);
+        //console.log(result2);
+        const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
+        console.log(result3);
     }
     return(
         <>

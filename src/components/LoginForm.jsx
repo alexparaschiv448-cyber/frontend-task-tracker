@@ -5,7 +5,7 @@ import PageLayout from "../components/PageLayout";
 import Input from "./Input.jsx";
 import {useNavigate} from "react-router-dom";
 import {context} from "./Context.jsx";
-
+import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 export default function LoginForm() {
     const nav=useNavigate();
@@ -49,30 +49,23 @@ export default function LoginForm() {
             //alert("Yes");
             setLoading(true);
             const sendPostRequest = async () => {
-                try {
-                    const response = await fetch("http://localhost:8000/auth/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        }),
+                const r=await FetchWrapper("http://localhost:8000/auth/login",
+                    "POST",
+                    {
+                    "Content-Type": "application/json",
+                    },{
+                        email: email,
+                        password: password
                     });
+                try {
 
-                    const result = await response.json().catch(() => ({}));
-                    //console.log("RESPONSE: "+response.json());
-                    if (!response.ok) {
-                        throw new Error("Error");
-                    }
                     //alert("User successfully registered!");
                     //nav("/");
                     //setData(result);
                     setLoading(false);
 
-                    console.log("Rezultat:",result.token);
-                    if('message' in result){
+                    console.log("Rezultat:",r.result.token);
+                    if('message' in r.result){
                         console.log("tee");
                         setMessage("Invalid data!");
                         setStatus("error");
@@ -87,7 +80,7 @@ export default function LoginForm() {
 
                             //setName(result.firstname+" "+result.lastname);
                             //setEmail(result.email);
-                            sessionStorage.setItem("authorization",result.token);
+                            sessionStorage.setItem("authorization",r.result.token);
                             //setName1(result.firstname+" "+result.lastname)
                             //setEmail1(result.email);
                             //sessionStorage.setItem("name",result.firstname+" "+result.lastname);

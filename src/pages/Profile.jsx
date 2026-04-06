@@ -1,14 +1,12 @@
 import '../index.css'
-
 import PageLayout from "../components/PageLayout";
-import RegisterForm from "../components/RegisterForm";
 import {useContext} from "react";
 import {user_context} from "../components/AuthCheck.jsx";
 
 export default function Register() {
-    const {na,em}=useContext(user_context);
-    const [name,setName]=na;
-    const[email, setEmail] = em;
+    const {user_name,user_email}=useContext(user_context);
+    const [name,setName]=user_name;
+    const[email, setEmail] = user_email;
     return(
         <>
             <PageLayout>

@@ -1,7 +1,6 @@
 import '../index.css'
-import {use, useState} from 'react';
-import {useContext,useEffect} from "react";
-import Context, {context} from "../components/Context.jsx";
+import {useContext} from "react";
+import {context} from "../components/Context.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import {useNavigate} from "react-router-dom";
 import {user_context} from "../components/AuthCheck.jsx";
@@ -10,12 +9,12 @@ import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 export default function Dashboard() {
     const nav=useNavigate();
-    const {a,b,c}=useContext(context);
-    const {na,em}=useContext(user_context);
-    const [message,setMessage]=b;
-    const [status,setStatus]=c;
-    const [name,setName]=na;
-    const[email, setEmail] = em;
+    const {toast_message,message_status}=useContext(context);
+    const [message,setMessage]=toast_message;
+    const [status,setStatus]=message_status;
+    const {user_name,user_email}=useContext(user_context);
+    const [name,setName]=user_name;
+    const[email, setEmail] = user_email;
 
     function HandleClick(){
         let email="test@yahoo.com"
@@ -43,7 +42,11 @@ export default function Dashboard() {
                 setEmail(result.email);
 
             } catch (error) {
-                alert(error);
+                setMessage("Error: "+error.message);
+                setStatus("error");
+                setTimeout(() => {
+                    setMessage("");setStatus("");
+                }, 3000);
             }finally {
                 setLoading(false);
             }

@@ -1,4 +1,4 @@
-import {useNavigate,useLocation} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import NavButton from "./NavButton";
 import {context} from "./Context.jsx";
 import {useContext,useEffect} from "react";
@@ -6,12 +6,12 @@ import Toast from "./Toast";
 import {user_context} from "./AuthCheck.jsx";
 
 export default function NavBar(){
-    const {na,em}=useContext(user_context);
-    const [name,setName]=na;
-    const[email, setEmail] = em;
-    const {a,b,c}=useContext(context);
-    const [message,setMessage]=b;
-    const [status,setStatus]=c;
+    const {user_name,user_email}=useContext(user_context);
+    const [name,setName]=user_name;
+    const[email, setEmail] = user_email;
+    const {toast_message,message_status}=useContext(context);
+    const [message,setMessage]=toast_message;
+    const [status,setStatus]=message_status;
     let nav=useNavigate();
 
 

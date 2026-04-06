@@ -50,7 +50,7 @@ export default function AuthCheck({children}){
         else if(location.pathname !=="/" && location.pathname !=="/login" && location.pathname !=="/register" && location.pathname !=="/error" && (!sessionStorage.getItem("authorization"))){
             return <Navigate to={"/error"} replace></Navigate>;}
 
-        return <user_context.Provider value={{"na":[name,setName],"em":[email,setEmail]}}>{children}</user_context.Provider>
+        return <user_context.Provider value={{"user_name":[name,setName],"user_email":[email,setEmail]}}>{children}</user_context.Provider>
     }else{
         return null;
     }

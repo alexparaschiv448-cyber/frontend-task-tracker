@@ -13,9 +13,9 @@ export default function RegisterForm() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const {a,b,c}=useContext(context);
-    const [message,setMessage]=b;
-    const [status,setStatus]=c;
+    const {toast_message,message_status}=useContext(context);
+    const [message,setMessage]=toast_message;
+    const [status,setStatus]=message_status;
     const [disabled,setDisabled]=useState(false);
 
 

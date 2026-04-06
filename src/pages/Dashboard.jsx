@@ -12,6 +12,8 @@ export default function Dashboard() {
     const nav=useNavigate();
     const {a,b,c}=useContext(context);
     const {na,em}=useContext(user_context);
+    const [message,setMessage]=b;
+    const [status,setStatus]=c;
     const [name,setName]=na;
     const[email, setEmail] = em;
 
@@ -70,7 +72,11 @@ export default function Dashboard() {
                     nav("/login");
                 }
             }catch(error){
-                console.error("Error:", error);
+                setMessage("Error: "+error.message);
+                setStatus("error");
+                setTimeout(() => {
+                    setMessage("");setStatus("");
+                }, 3000);
             }
         }
         check();
@@ -86,7 +92,11 @@ export default function Dashboard() {
             )
         const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
         const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
-        console.log(result3);
+        setMessage("Status: "+result3.status);
+        setStatus("success");
+        setTimeout(() => {
+            setMessage("");setStatus("");
+        }, 3000);
     }
     return(
         <>

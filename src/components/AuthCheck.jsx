@@ -10,6 +10,8 @@ export default function AuthCheck({children}){
     const nav=useNavigate();
     const [name,setName]=useState("");
     const [email,setEmail]=useState("");
+    const [id,setId]=useState("");
+    const [created_at,setCreated_at]=useState("");
 
 
 
@@ -31,6 +33,8 @@ export default function AuthCheck({children}){
                 }else{
                     setName(r.result.firstname+" "+r.result.lastname);
                     setEmail(r.result.email);
+                    setId(r.result.id);
+                    setCreated_at(r.result.createdat);
                 }
                 setLoading(false);
             }
@@ -40,6 +44,8 @@ export default function AuthCheck({children}){
             setLoading(false);
             setName("");
             setEmail("");
+            setId("");
+            setCreated_at("");
         }
 
     },[location.pathname])
@@ -50,7 +56,7 @@ export default function AuthCheck({children}){
         else if(location.pathname !=="/" && location.pathname !=="/login" && location.pathname !=="/register" && location.pathname !=="/error" && (!sessionStorage.getItem("authorization"))){
             return <Navigate to={"/error"} replace></Navigate>;}
 
-        return <user_context.Provider value={{"user_name":[name,setName],"user_email":[email,setEmail]}}>{children}</user_context.Provider>
+        return <user_context.Provider value={{"user_name":[name,setName],"user_email":[email,setEmail],"user_id":[id,setId],"user_creation_date":[created_at,setCreated_at]}}>{children}</user_context.Provider>
     }else{
         return null;
     }

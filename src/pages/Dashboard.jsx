@@ -6,10 +6,11 @@ import {useNavigate} from "react-router-dom";
 import {user_context} from "../components/AuthCheck.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
 
-
 export default function Dashboard() {
     const nav=useNavigate();
-    const {toast_message,message_status}=useContext(context);
+
+    const {toast_message,message_status,loading_status}=useContext(context);
+    const [loading,setLoading]=loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
     const {user_name,user_email}=useContext(user_context);
@@ -85,7 +86,7 @@ export default function Dashboard() {
         check();
     }
     async function CheckFetch(){
-        const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.myJmaXJzdG5hbWUiOiJBbGV4IiwibGFzdG5hbWUiOiJQIiwiZW1haWwiOiJhbGV4QHlhaG9vLmNvbSIsImV4cCI6MTc3NTE5OTY5OX0.957gK1UviXzG9O8RwEfGGlzn0Hlv8ikWatTMsfu2vJw";
+        const token=sessionStorage.getItem("authorization");
         const result= await FetchWrapper("http://localhost:8000/me",
             "POST",
             {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
@@ -95,7 +96,15 @@ export default function Dashboard() {
             )
         const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
         const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
-        setMessage("Status: "+result3.status);
+        const result4= await FetchWrapper("http://localhost:8000/users/48",
+            "PUT",
+            {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
+            {
+                email:"alex@yahoo.com",firstname:"Alex",lastname:"Paraschiv"
+            }
+        )
+        sessionStorage.setItem("authorization", result4.result.token);
+        setMessage("Status: "+result4.status);
         setStatus("success");
         setTimeout(() => {
             setMessage("");setStatus("");
@@ -119,6 +128,11 @@ export default function Dashboard() {
                 <button onClick={CheckFetch}>Check fetch wrapper</button>
                 <h1>User is: {name? name:''}</h1>
                 {name ? <h1>Welcome {name}!</h1> : <h1>Welcome guest!</h1>}
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <button onClick={()=>{setLoading(true)}}>Test loading</button>
             </PageLayout>
         </>
     )

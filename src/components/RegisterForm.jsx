@@ -11,9 +11,10 @@ export default function RegisterForm() {
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
+
     const [error, setError] = useState(null);
-    const {toast_message,message_status}=useContext(context);
+    const {toast_message,message_status,loading_status}=useContext(context);
+    const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
     const [disabled,setDisabled]=useState(false);
@@ -28,7 +29,7 @@ export default function RegisterForm() {
 
             if (
                 !(char >= 'a' && char <= 'z') &&
-                !(char >= 'A' && char <= 'Z') && (char===' ')
+                !(char >= 'A' && char <= 'Z') || (char===' ')
             ) {
                 return "No symbols, spaces or numbers!";
             }
@@ -39,15 +40,16 @@ export default function RegisterForm() {
         if(email.length>30){
             return "Email too long!";
         }
+        let checkAt=false;
         if (email.length>0){
             for (let i = 0; i < email.length; i++) {
                 const char = email[i];
-                if(char==='@'){return false}
+                if(char!=='@' && char!=='.' && !(char >= 'a' && char <= 'z') && !(char >= 'A' && char <= 'Z') || char===' '){return "Incorrect email format!";}
+                if(char==='@'){checkAt=true;}
             }
-            return "Incorrect email format!";
-        }
-        return false;
-
+        }else{return false;}
+        if(checkAt){return false;}
+        else{return "Incorrect email format!";}
     }
     function validatePassword(password){
         if(password.length>100){
@@ -139,7 +141,6 @@ export default function RegisterForm() {
                 {validatePassword(password) ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                     {validatePassword(password)}</p> : <br/>}
                 <button disabled={disabled} type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>
-                {loading ? <p className="text-sm text-gray-500 mt-1 h-5 ml-4">Loading</p>:<br/>}
             </form>
 
         </>

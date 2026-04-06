@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+
 import '../index.css'
 
 export default function Input({value,text,handleChange,type}) {

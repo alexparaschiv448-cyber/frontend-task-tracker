@@ -1,5 +1,3 @@
-import {useNavigate} from "react-router-dom";
-
 export default function NavButton({text,clickHandler}) {
     if(sessionStorage.getItem("authorization") && (text==="Register" || text==="Login")){
         return(<></>);

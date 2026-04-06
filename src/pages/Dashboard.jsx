@@ -1,9 +1,7 @@
 import '../index.css'
 import {use, useState} from 'react';
-import cImage from "../assets/c.png";
 import {useContext,useEffect} from "react";
 import Context, {context} from "../components/Context.jsx";
-import PageHeader from "../components/PageLayout.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import {useNavigate} from "react-router-dom";
 import {user_context} from "../components/AuthCheck.jsx";
@@ -11,18 +9,11 @@ import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 
 export default function Dashboard() {
-    //const {state,setState} = useContext(context);
-    //console.log(state);
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const nav=useNavigate();
     const {a,b,c}=useContext(context);
     const {na,em}=useContext(user_context);
     const [name,setName]=na;
     const[email, setEmail] = em;
-    const [message,setMessage]=b;
-    const [status,setStatus]=c;
 
     function HandleClick(){
         let email="test@yahoo.com"
@@ -45,18 +36,11 @@ export default function Dashboard() {
                 if (!response.ok) {
                     throw new Error("Error creating user!");
                 }
-                console.log(result);
-                //alert("User successfully registered!");
-                //nav("/");
-                //setData(result);
                 sessionStorage.setItem("authorization", result.token);
-                //sessionStorage.setItem("name", result.firstname+" "+result.lastname);
-                //sessionStorage.setItem("email", result.email);
                 setName(result.firstname+" "+result.lastname);
                 setEmail(result.email);
 
             } catch (error) {
-                //console.error("Error:", error);
                 alert(error);
             }finally {
                 setLoading(false);
@@ -77,15 +61,12 @@ export default function Dashboard() {
                         "Authorization":`Bearer ${token}`
                     }
                 });
-                console.log(response.status);
                 result = await response.json().catch(() => ({}));
                 if (response.status === 401 && result.detail==="Token Expired") {
                     alert(result.detail);
                     sessionStorage.clear();
                     setName("");
                     setEmail("");
-                    //sessionStorage.removeItem("name");
-                    //sessionStorage.removeItem("email");
                     nav("/login");
                 }
             }catch(error){
@@ -103,9 +84,7 @@ export default function Dashboard() {
                 authorization: token
             }
             )
-        //console.log(result);
         const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
-        //console.log(result2);
         const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
         console.log(result3);
     }

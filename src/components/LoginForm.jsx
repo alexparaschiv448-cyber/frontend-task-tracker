@@ -1,7 +1,5 @@
 import '../index.css'
 import {useContext, useState} from 'react';
-import cImage from "../assets/c.png";
-import PageLayout from "../components/PageLayout";
 import Input from "./Input.jsx";
 import {useNavigate} from "react-router-dom";
 import {context} from "./Context.jsx";
@@ -9,14 +7,9 @@ import FetchWrapper from "../assets/FetchWrapper.jsx";
 
 export default function LoginForm() {
     const nav=useNavigate();
-    const[firstName, setFirstName] = useState('');
-    const[lastName, setLastName] = useState('');
-    const [name1,setName1]=useState("");
-    const [email1,setEmail1]=useState("");
 
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
-    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const {a,b,c}=useContext(context);
@@ -46,7 +39,6 @@ export default function LoginForm() {
     function handleClick(){
         setDisabled(true);
         if(!validateEmail(email) && !validatePassword(password) &&  email!=='' && password!=='') {
-            //alert("Yes");
             setLoading(true);
             const sendPostRequest = async () => {
                 const r=await FetchWrapper("http://localhost:8000/auth/login",
@@ -59,14 +51,9 @@ export default function LoginForm() {
                     });
                 try {
 
-                    //alert("User successfully registered!");
-                    //nav("/");
-                    //setData(result);
                     setLoading(false);
 
-                    console.log("Rezultat:",r.result.token);
                     if('message' in r.result){
-                        console.log("tee");
                         setMessage("Invalid data!");
                         setStatus("error");
                         setTimeout(() => {
@@ -76,22 +63,13 @@ export default function LoginForm() {
                         setMessage("User successfully logged in!");
                         setStatus("success");
                         setTimeout(() => {
-                            setMessage("");setStatus("");console.log("tee2");
-
-                            //setName(result.firstname+" "+result.lastname);
-                            //setEmail(result.email);
+                            setMessage("");setStatus("");
                             sessionStorage.setItem("authorization",r.result.token);
-                            //setName1(result.firstname+" "+result.lastname)
-                            //setEmail1(result.email);
-                            //sessionStorage.setItem("name",result.firstname+" "+result.lastname);
-                            //sessionStorage.setItem("email",result.email);
-                            console.log("AUTH: "+sessionStorage.getItem("authorization"));
                             nav("/");
                         }, 2000);
                     }
 
                 } catch (error) {
-                    //console.error("Error:", error);
                     alert(error);
                 }finally {
                     setLoading(false);
@@ -99,7 +77,6 @@ export default function LoginForm() {
             };
             sendPostRequest();
         }else{
-            console.log("tee");
             setMessage("Invalid data!");
             setStatus("error");
             setTimeout(() => {

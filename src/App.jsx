@@ -1,12 +1,7 @@
 import './index.css'
-import Page from "./pages/page.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ConditionalRoute from "./components/ConditionalRoute.jsx";
 import Error from "./pages/Error.jsx";
-import ErrorWrapper from "./components/ErrorWraper.jsx";
-import {useState, createContext, useContext,Provider} from 'react';
 import Context from "./components/Context.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
@@ -26,7 +21,6 @@ export default function App() {
                     <Route path="/register" element={ <AuthCheck><Register/> </AuthCheck>}/>
                     <Route path="/login" element={<AuthCheck><Login/> </AuthCheck>}/>
                     <Route path="/error" element={<AuthCheck><Error /></AuthCheck>} />
-                    <Route path="/test" element={<ConditionalRoute><Page/></ConditionalRoute>} />
                     <Route path="/me" element={<AuthCheck><Profile /></AuthCheck>} />
                     <Route path="*" element={<AuthCheck><Error /></AuthCheck>} />
 

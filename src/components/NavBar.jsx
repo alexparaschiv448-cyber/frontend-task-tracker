@@ -1,13 +1,11 @@
-import {Navigate,useNavigate,useLocation} from "react-router-dom";
+import {useNavigate,useLocation} from "react-router-dom";
 import NavButton from "./NavButton";
 import {context} from "./Context.jsx";
-import {useContext, useState,useEffect} from "react";
+import {useContext,useEffect} from "react";
 import Toast from "./Toast";
 import {user_context} from "./AuthCheck.jsx";
 
 export default function NavBar(){
-    //let name='';
-    //let email='';
     const {na,em}=useContext(user_context);
     const [name,setName]=na;
     const[email, setEmail] = em;
@@ -15,23 +13,16 @@ export default function NavBar(){
     const [message,setMessage]=b;
     const [status,setStatus]=c;
     let nav=useNavigate();
-    const Location=useLocation();
 
 
     useEffect(() => {
         setMessage("");
         setStatus("");
     }, [location.pathname]);
-    //if(sessionStorage.getItem("name")  && sessionStorage.getItem("email")){
-    //    name=sessionStorage.getItem("name")
-    //    email=sessionStorage.getItem("email");
-   // }
-    console.log("Status: "+!!status);
     return(
         <>
             <div className="w-full h-[7vh] bg-blue-900 flex items-center justify-between px-6">
 
-                {/* Left side buttons */}
                 <div className="flex space-x-3">
                     <Toast type={status} message={message}  show={!!status}/>
                     <NavButton clickHandler={()=>{nav("/");}} text="Dashboard"/>
@@ -39,14 +30,7 @@ export default function NavBar(){
                     <NavButton clickHandler={()=>{nav("/login");}} text="Login"/>
                     <NavButton clickHandler={()=>{
                         setMessage("Successfully logged out!");
-                        setStatus("success");console.log(status);
-
-
-                            //setName("");setEmail("");
-
-                            //setMessage("");
-                            //setStatus("");
-                            console.log(status);
+                        setStatus("success");
                         setTimeout(() => {
                             setMessage("");
                             setStatus("");

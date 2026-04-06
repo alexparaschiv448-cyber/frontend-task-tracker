@@ -1,5 +1,4 @@
-import React, {useState, useEffect, useContext} from "react";
-import {context} from "./Context.jsx";
+import React, {useState, useEffect} from "react";
 
 const Toast = ({ message, type , duration = 3000 ,show=false}) => {
     const [visible, setVisible] = useState(false);
@@ -14,9 +13,7 @@ const Toast = ({ message, type , duration = 3000 ,show=false}) => {
 
         return () => clearTimeout(timer);
     }, [show, message, duration]);
-    console.log("Show: ",show);
-    if (!visible) {console.log("returned null");return null;}
-    console.log("Still visible: ", visible);
+    if (!visible) {return null;}
     const baseClasses =
         "fixed bottom-5 right-5 max-w-xs w-full p-4 rounded shadow-lg flex items-start space-x-3 text-white animate-slideIn";
 

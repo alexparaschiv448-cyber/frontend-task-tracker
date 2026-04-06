@@ -1,9 +1,7 @@
-import {useRef, useEffect, useState, useContext} from 'react';
+import {useEffect, useState, useContext} from 'react';
 import {useNavigate} from "react-router-dom";
 import Input from './Input';
-import Toast from './Toast';
 import {context} from "./Context.jsx";
-import {user_context} from "./AuthCheck.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx"
 export default function RegisterForm() {
     const nav=useNavigate();
@@ -20,13 +18,6 @@ export default function RegisterForm() {
     const [status,setStatus]=c;
     const [disabled,setDisabled]=useState(false);
 
-    function statusMessage(m,s){
-        setMessage(m);
-        setStatus(s);
-    }
-    console.log("First name: ",firstName);
-    console.log("Last name: ",lastName);
-    console.log(email.length);
 
     function validateName(name){
         if(name.length>30){
@@ -70,7 +61,6 @@ export default function RegisterForm() {
             setData(r.result.unique);
 
         }
-        //checkEmail();
         const timer = setTimeout(() => {
             if (email) checkEmail();
         }, 500);
@@ -82,7 +72,6 @@ export default function RegisterForm() {
     }, [email]);
     function handleClick(){
         if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data){
-            //alert("Yes");
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
@@ -96,37 +85,29 @@ export default function RegisterForm() {
                             email: email,
                             passwordHash: password
                         });
-
-                    //alert("User successfully registered!");
-                    //nav("/");
-                    //setData(result);
                     setLoading(false);
                     setData(true);
                     setMessage("User successfully registered!");
                     setStatus("success");
-                    console.log("tee");
                     setTimeout(() => {
-                        setMessage("");setStatus("");console.log("tee2");
+                        setMessage("");setStatus("")
                         setDisabled(true);
-                        //sessionStorage.setItem("name",result.firstname+" "+result.lastname);
-                        //sessionStorage.setItem("email",result.email);
                         sessionStorage.setItem("authorization",r.result.token);
                         nav("/");
                     }, 2000);
                 } catch (error) {
-                    //console.error("Error:", error);
-                    alert(error);
+                    setMessage("Error: "+error.message);
+                    setStatus("error");
+                    setTimeout(() => {
+                        setMessage("");setStatus("");
+                    }, 3000);
                 }finally {
                     setLoading(false);
                 }
             };
             sendPostRequest();
-            //setStatus("error");
-            //setMessage("Invalid data!");
-            //console.log(status+" "+message);
 
         }else{
-            console.log("tee");
             setMessage("Invalid data!");
             setStatus("error");
             setTimeout(() => {
@@ -134,7 +115,6 @@ export default function RegisterForm() {
             }, 3000);
         }
 
-        //nav("/");
     }
 
     return (

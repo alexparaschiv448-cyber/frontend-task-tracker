@@ -87,28 +87,13 @@ export default function Dashboard() {
     }
     async function CheckFetch(){
         const token=sessionStorage.getItem("authorization");
-        const result= await FetchWrapper("http://localhost:8000/me",
+        const result5 = await FetchWrapper("http://localhost:8000/projects",
             "POST",
             {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
             {
-                authorization: token
-            }
-            )
-        const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
-        const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
-        const result4= await FetchWrapper("http://localhost:8000/users/48",
-            "PUT",
-            {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
-            {
-                email:"alex@yahoo.com",firstname:"Alex",lastname:"Paraschiv"
-            }
-        )
-        sessionStorage.setItem("authorization", result4.result.token);
-        setMessage("Status: "+result4.status);
-        setStatus("success");
-        setTimeout(() => {
-            setMessage("");setStatus("");
-        }, 3000);
+                name:"Test name",description:"test description",status:"New"
+            })
+        console.log(result5);
     }
     return(
         <>

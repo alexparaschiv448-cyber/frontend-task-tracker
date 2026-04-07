@@ -3,7 +3,7 @@ export default function NavButton({text,clickHandler}) {
         return(<></>);
 
     }
-    if(!sessionStorage.getItem("authorization") && (text==="Logout" ||  text==="Profile")){
+    if(!sessionStorage.getItem("authorization") && (text==="Logout" ||  text==="Profile" || text==="Projects")){
         return(<></>);
     }
     return(

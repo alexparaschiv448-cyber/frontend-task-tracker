@@ -36,6 +36,9 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
     function validateEmail(email){
         if(email.length>30){
             return "Email too long!";
@@ -57,6 +60,12 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
+
+
+
     useEffect(() => {
         async function checkEmail() {
             const r= await FetchWrapper("http://localhost:8000/checkemail/"+email);
@@ -72,6 +81,11 @@ export default function RegisterForm() {
             controller.abort();
         };
     }, [email]);
+
+
+
+
+
     function handleClick(){
         if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data){
             setLoading(true);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function FilterBar({onClickButton,onClickOrder,onChangeNumber,onChangeStatus,onChangeName,order,pageLimit}) {
+export default function FilterBar({onClickButton,onClickOrder,onChangeNumber,onChangeStatus,onChangeName,order,pageLimit,onClickSearch}) {
 
     return (
         <div className="w-full h-[7%] bg-blue-100 flex items-center px-6 gap-6 shadow-sm">
@@ -50,10 +50,10 @@ export default function FilterBar({onClickButton,onClickOrder,onChangeNumber,onC
                     onChange={onChangeName}
                     className="bg-white border border-gray-300 px-3 py-2 rounded-l-md focus:outline-none"
                 />
-                <button
+                <button onClick={onClickSearch}
                     className="text-blue-100 hover:text-white hover:bg-blue-800 px-4 py-2 rounded-r-md transition duration-200 bg-blue-600"
                 >
-                    Search
+                    Filter
                 </button>
             </div>
         </div>

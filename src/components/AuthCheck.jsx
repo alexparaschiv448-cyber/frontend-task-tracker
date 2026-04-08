@@ -19,7 +19,7 @@ export default function AuthCheck({children}){
 
         if(sessionStorage.getItem("authorization")) {
             async function check() {
-                const r= await FetchWrapper("http://localhost:8000/me",
+                const results= await FetchWrapper("http://localhost:8000/me",
                     "POST",
                     {
                     "Content-Type": "application/json",
@@ -27,14 +27,14 @@ export default function AuthCheck({children}){
                 },{
                     authorization: sessionStorage.getItem("authorization"),
                 });
-                if (r.status===401) {
+                if (results.status===401) {
                         sessionStorage.clear();
                         nav("/login");
                 }else{
-                    setName(r.result.firstname+" "+r.result.lastname);
-                    setEmail(r.result.email);
-                    setId(r.result.id);
-                    setCreated_at(r.result.createdat);
+                    setName(results.result.firstname+" "+results.result.lastname);
+                    setEmail(results.result.email);
+                    setId(results.result.id);
+                    setCreated_at(results.result.createdat);
                 }
                 setLoading(false);
             }

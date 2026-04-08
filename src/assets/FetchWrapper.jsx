@@ -1,5 +1,5 @@
 
-export default function Fetch(url,method="GET",headers={"Content-Type": "application/json"},Body){
+export default function Fetch(url,method="GET",headers={"Content-Type": "application/json"},Body,Query=''){
     if(method==="POST"){
         const sendPostRequest = async () => {
             try {
@@ -18,7 +18,7 @@ export default function Fetch(url,method="GET",headers={"Content-Type": "applica
     else if(method==="GET"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(url +Query, {
                     method: method,
                     headers: headers,
                 });

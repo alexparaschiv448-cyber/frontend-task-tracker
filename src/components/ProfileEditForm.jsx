@@ -29,7 +29,7 @@ export default function RegisterForm() {
     useEffect(() => {
         if(inputEmail!==email) {
             async function checkEmail() {
-                const r = await FetchWrapper("http://localhost:8000/checkemail/" + inputEmail);
+                const r = await FetchWrapper("/checkemail/" + inputEmail);
                 setUniqueEmail(r.result.unique);
             }
             const timer = setTimeout(() => {
@@ -88,7 +88,7 @@ export default function RegisterForm() {
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                    const results = await FetchWrapper("/users/"+id,
                         "PUT",
                         {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`},
                         {
@@ -133,7 +133,7 @@ export default function RegisterForm() {
         setLoading(true);
         const sendPostRequest = async () => {
             try {
-                const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                const results = await FetchWrapper("/users/"+id,
                     "DELETE",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`}
                 );

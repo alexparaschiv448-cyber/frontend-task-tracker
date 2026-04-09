@@ -33,29 +33,24 @@ export default function Projects() {
         let query=`?order=${order}&limit=${pageLimit}&offset=${(page-1)*pageLimit}`;
         if(projectName){query+=`&name=${projectName}`;}
         if(projectStatus!=="Any"){query+=`&status=${projectStatus}`;}
-        console.log(projectName);
         setLoading(true);
         async function fetchData(){
             try {
-                const results = await FetchWrapper("http://localhost:8000/projects",
+                const results = await FetchWrapper("/projects",
                     "GET",
                     {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                //console.log(results)
-                //console.log(results.result.projects.length > 0);
                 if (results.result.projects.length > 0) {
 
                     setLimit(results.result.projects[0].limit);
                     setProjects(results.result.projects);
                     if (page > Math.ceil(results.result.projects[0].limit / pageLimit)) {
                         setPage(Math.ceil(results.result.projects[0].limit / pageLimit));
-                        console.log("PAGONAAAAA");
                     }
                 } else {
-                    console.log("NOO");
                     setLimit(0);
                     setProjects([]);
                     setPage(1);
@@ -75,10 +70,6 @@ export default function Projects() {
         fetchData();
     }, [page,sendSearch]);
 
-
-    useEffect(()=>{
-        console.log("PROIECTE: ",projects);
-    },[projects]);
 
 
     return(

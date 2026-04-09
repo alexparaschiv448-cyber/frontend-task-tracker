@@ -7,20 +7,17 @@ import Input from "./Input";
 import Description from "./Description";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
 import {context} from "./Context.jsx";
+import {statuses} from "../assets/ProjectSettings.jsx";
 
 export default function Projects() {
     let nav=useNavigate();
-    const statuses=["new","In Progress","Done"];
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
-    const [projectStatus, setProjectStatus] = useState("New");
+    const [projectStatus, setProjectStatus] = useState(statuses.NEW);
     const {toast_message,message_status,loading_status}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
-    useEffect(()=>{
-        console.log(projectStatus);
-    },[projectStatus]);
     function validateName(name){
         if(name.length>50){
             return "Name too long!";
@@ -39,7 +36,7 @@ export default function Projects() {
             async function createProject(){
                 try {
                     if(projectDescription){
-                        const results = await FetchWrapper("http://localhost:8000/projects",
+                        const results = await FetchWrapper("/projects",
                             "POST",
                             {
                                 "Content-Type": "application/json",
@@ -49,7 +46,7 @@ export default function Projects() {
                                 name: projectName, description: projectDescription, status: projectStatus,
                             })
                     }else{
-                        const results = await FetchWrapper("http://localhost:8000/projects",
+                        const results = await FetchWrapper("/projects",
                             "POST",
                             {
                                 "Content-Type": "application/json",
@@ -97,12 +94,12 @@ export default function Projects() {
             <br/>
             <label className="ml-5">Status:</label>
             <select onChange={(e) =>{
-                if(statuses.includes(e.target.value)){setProjectStatus(e.target.value);}
-                else{setProjectStatus("New");}
+                if(Object.values(statuses).includes(e.target.value)){setProjectStatus(e.target.value);}
+                else{setProjectStatus(statuses.NEW);}
             }}>
-                <option value="New">New</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Done">Done</option>
+                <option value={statuses.NEW}>New</option>
+                <option value={statuses.IN_PROGRESS}>In Progress</option>
+                <option value={statuses.DONE}>Done</option>
             </select>
             <br/>
             <br/>

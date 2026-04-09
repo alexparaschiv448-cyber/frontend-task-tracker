@@ -19,7 +19,7 @@ export default function AuthCheck({children}){
 
         if(sessionStorage.getItem("authorization")) {
             async function check() {
-                const results= await FetchWrapper("http://localhost:8000/me",
+                const results= await FetchWrapper("/me",
                     "POST",
                     {
                     "Content-Type": "application/json",

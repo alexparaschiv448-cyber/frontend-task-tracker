@@ -56,7 +56,7 @@ export default function Projects() {
                                 name: projectName, status: projectStatus,
                             })
                     }
-                    setMessage("User successfully registered!");
+                    setMessage("Project created!");
                     setStatus("success");
                     setTimeout(() => {
                         setMessage("");setStatus("")

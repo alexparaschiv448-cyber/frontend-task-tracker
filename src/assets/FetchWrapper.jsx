@@ -3,7 +3,7 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
     if(method==="POST"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(project_url+endpoint, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                     body: JSON.stringify(Body),
@@ -32,7 +32,7 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
     else if(method==="PUT"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(project_url+endpoint, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                     body: JSON.stringify(Body),
@@ -46,7 +46,7 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
     }else if(method==="DELETE"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(project_url+endpoint, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                 });

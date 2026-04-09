@@ -218,7 +218,7 @@ export default function RegisterForm() {
                 <br/>
                 <br/>
                 <button onClick={()=>{
-                    const result = window.confirm("Are you sure you want to delete your account?");
+                    const result = window.confirm("Are you sure you want to delete your account? All projects will be deleted!");
                     if (result) {handleClickDelete();}
                 }} className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">DELETE ACCOUNT</button>
             </form>

@@ -1,4 +1,6 @@
 import React from "react";
+import {Link} from "react-router-dom";
+
 
 const getStatusStyles = (status) => {
     switch (status) {
@@ -48,7 +50,7 @@ const ProjectList = ({ projects }) => {
                     {/* CENTER: Name */}
                     <div className="flex-1 flex justify-center">
                         <div className="text-base font-semibold text-gray-900 tracking-wide">
-                            {project.name}
+                            <Link to={`/project/${project.id}`}>{project.name}</Link>
                         </div>
                     </div>
 

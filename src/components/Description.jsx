@@ -1,11 +1,13 @@
 import '../index.css'
 
-export default function Description({handleChange}) {
+export default function Description({handleChange,value,readonly}) {
     return (
         <>
             <textarea
                 placeholder="Description"
                 onChange={handleChange}
+                value={value}
+                readOnly={readonly}
                 className="
                 ml-4
                 w-[40%]

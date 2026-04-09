@@ -80,7 +80,7 @@ export default function ProjectEditForm() {
                     nav("/login");
                 }else if(results.status===404){
                     nav("/error");
-                }else{
+                }else if(results.status===200){
                     if(results.result.description!=="None"){
                         setProjectDescription(results.result.description);
                         setInitialDescription(results.result.description);
@@ -111,12 +111,18 @@ export default function ProjectEditForm() {
 
     function handleClick(){
         setLoading(true);
+        let body;
+        if(projectDescription){
+            body={name:projectName,description:projectDescription,status:projectStatus}
+        }else{
+            body={name:projectName,status:projectStatus}
+        }
         const sendUpdateRequest = async () => {
             try {
                 const results = await FetchWrapper("/projects/"+id,
                     "PUT",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`},
-                    {name:projectName,description:projectDescription,status:projectStatus}
+                    body
                 );
                 if(results.status===401) {
 

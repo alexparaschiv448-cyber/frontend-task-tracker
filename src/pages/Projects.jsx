@@ -43,12 +43,12 @@ export default function Projects() {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                if (results.result.projects.length > 0) {
+                if (results.result.length > 0) {
 
-                    setLimit(results.result.projects[0].limit);
-                    setProjects(results.result.projects);
-                    if (page > Math.ceil(results.result.projects[0].limit / pageLimit)) {
-                        setPage(Math.ceil(results.result.projects[0].limit / pageLimit));
+                    setLimit(results.result[0].limit);
+                    setProjects(results.result);
+                    if (page > Math.ceil(results.result[0].limit / pageLimit)) {
+                        setPage(Math.ceil(results.result[0].limit / pageLimit));
                     }
                 } else {
                     setLimit(0);

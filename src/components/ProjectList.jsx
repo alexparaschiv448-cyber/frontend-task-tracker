@@ -27,6 +27,7 @@ const ProjectList = ({ projects }) => {
     return (
         <div className="flex flex-col gap-3 w-full ">
             {projects.map((project, index) => (
+                <Link to={`/project/${project.id}`}>
                 <div
                     key={index}
                     className="w-full bg-white rounded-lg px-4 flex h-[60px] items-center
@@ -50,7 +51,7 @@ const ProjectList = ({ projects }) => {
                     {/* CENTER: Name */}
                     <div className="flex-1 flex justify-center">
                         <div className="text-base font-semibold text-gray-900 tracking-wide">
-                            <Link to={`/project/${project.id}`}>{project.name}</Link>
+                            {project.name}
                         </div>
                     </div>
 
@@ -61,8 +62,10 @@ const ProjectList = ({ projects }) => {
                         </div>
                     </div>
                 </div>
+                </Link>
             ))}
         </div>
+
     );
 };
 

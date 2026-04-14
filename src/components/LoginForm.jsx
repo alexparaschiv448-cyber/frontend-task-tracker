@@ -41,7 +41,7 @@ export default function LoginForm() {
         if(!validateEmail(email) && !validatePassword(password) &&  email!=='' && password!=='') {
             setLoading(true);
             const sendPostRequest = async () => {
-                const r=await FetchWrapper("http://localhost:8000/auth/login",
+                const r=await FetchWrapper("/auth/login",
                     "POST",
                     {
                     "Content-Type": "application/json",

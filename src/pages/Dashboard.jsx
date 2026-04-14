@@ -23,7 +23,7 @@ export default function Dashboard() {
         setLoading(true);
         const getJWT = async () => {
             try {
-                const response = await fetch("http://localhost:8000/auth/login", {
+                const response = await fetch("/auth/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export default function Dashboard() {
         let result;
         async function check(){
             try{
-                response = await fetch("http://localhost:8000/conn", {
+                response = await fetch("/conn", {
                     method: "GET",
                     headers: {
                         "Authorization":`Bearer ${token}`
@@ -85,31 +85,7 @@ export default function Dashboard() {
         }
         check();
     }
-    async function CheckFetch(){
-        const token=sessionStorage.getItem("authorization");
-        const result= await FetchWrapper("http://localhost:8000/me",
-            "POST",
-            {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
-            {
-                authorization: token
-            }
-            )
-        const result2 = await FetchWrapper("http://localhost:8000/checkemail/alex@yahoo.com","GET");
-        const result3 = await FetchWrapper("http://localhost:8000/conn","GET",{"Content-Type": "application/json","Authorization": `Bearer ${token}`});
-        const result4= await FetchWrapper("http://localhost:8000/users/48",
-            "PUT",
-            {"Content-Type": "application/json","Authorization": `Bearer ${token}`},
-            {
-                email:"alex@yahoo.com",firstname:"Alex",lastname:"Paraschiv"
-            }
-        )
-        sessionStorage.setItem("authorization", result4.result.token);
-        setMessage("Status: "+result4.status);
-        setStatus("success");
-        setTimeout(() => {
-            setMessage("");setStatus("");
-        }, 3000);
-    }
+
     return(
         <>
             <PageLayout>
@@ -125,7 +101,7 @@ export default function Dashboard() {
                 <br/>
                 <br/>
                 <br/>
-                <button onClick={CheckFetch}>Check fetch wrapper</button>
+                <button>Check fetch wrapper</button>
                 <h1>User is: {name? name:''}</h1>
                 {name ? <h1>Welcome {name}!</h1> : <h1>Welcome guest!</h1>}
                 <br/>

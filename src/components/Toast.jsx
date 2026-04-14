@@ -15,7 +15,7 @@ const Toast = ({ message, type , duration = 3000 ,show=false}) => {
     }, [show, message, duration]);
     if (!visible) {return null;}
     const baseClasses =
-        "fixed bottom-5 right-5 max-w-xs w-full p-4 rounded shadow-lg flex items-start space-x-3 text-white animate-slideIn";
+        "fixed bottom-5 right-5 max-w-xs w-full p-4 rounded shadow-lg flex items-start space-x-3 text-white animate-slideIn z-50";
 
     const typeClasses = {
         success: "bg-green-500",

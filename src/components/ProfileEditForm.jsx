@@ -29,7 +29,7 @@ export default function RegisterForm() {
     useEffect(() => {
         if(inputEmail!==email) {
             async function checkEmail() {
-                const r = await FetchWrapper("http://localhost:8000/checkemail/" + inputEmail);
+                const r = await FetchWrapper("/checkemail/" + inputEmail);
                 setUniqueEmail(r.result.unique);
             }
             const timer = setTimeout(() => {
@@ -88,7 +88,7 @@ export default function RegisterForm() {
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                    const results = await FetchWrapper("/users/"+id,
                         "PUT",
                         {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`},
                         {
@@ -133,7 +133,7 @@ export default function RegisterForm() {
         setLoading(true);
         const sendPostRequest = async () => {
             try {
-                const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                const results = await FetchWrapper("/users/"+id,
                     "DELETE",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`}
                 );
@@ -218,7 +218,7 @@ export default function RegisterForm() {
                 <br/>
                 <br/>
                 <button onClick={()=>{
-                    const result = window.confirm("Are you sure you want to delete your account?");
+                    const result = window.confirm("Are you sure you want to delete your account? All projects will be deleted!");
                     if (result) {handleClickDelete();}
                 }} className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">DELETE ACCOUNT</button>
             </form>

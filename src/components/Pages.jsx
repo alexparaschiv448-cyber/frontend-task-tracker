@@ -3,10 +3,10 @@ import '../index.css'
 export default function Pages({page,onPageChange,limit,pageLimit}) {
     const lastPage=Math.ceil(limit/pageLimit);
     let pages=[];
-    if(page===1){pages.push(<button key={0} data-id={1} className="px-3 py-1 bg-blue-300 text-gray-700 rounded-md hover:bg-blue-400 transition" onClick={onPageChange}>
+    if(page===1){pages.push(<button data-id={1} className="px-3 py-1 bg-blue-300 text-gray-700 rounded-md hover:bg-blue-400 transition" onClick={onPageChange}>
         1
     </button>);}
-    else{pages.push(<button key={0} data-id={1} className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition" onClick={onPageChange}>
+    else{pages.push(<button data-id={1} className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition" onClick={onPageChange}>
         1
     </button>);}
     if(page>=4){

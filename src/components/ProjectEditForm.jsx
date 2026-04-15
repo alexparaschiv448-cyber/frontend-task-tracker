@@ -246,6 +246,7 @@ export default function ProjectEditForm() {
                 <br/>
                 {canSubmit && <button type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>}
                 <br/>
+                <button onClick={()=>{nav("/task",{state:{projectId:id}})}} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4" >Create Task</button>
                 <br/>
                 <button onClick={()=>{
                     const result = window.confirm("Are you sure you want to delete this project?");

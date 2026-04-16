@@ -6,6 +6,7 @@ import Input from "./Input.jsx";
 import Description from "./Description.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx"
 
+
 export default function TaskCreateForm() {
 
     let nav=useNavigate();
@@ -106,8 +107,8 @@ export default function TaskCreateForm() {
                 setStatus("success");
                 setCanSubmit(false);
                 setTimeout(() => {
-                    setMessage("");setStatus("")
-                    nav("/");
+                    setMessage("");setStatus("");
+                    nav(`/project/${projectId}`);
                 }, 2000);
             }catch(error){
                 setMessage("Error: "+error.message);

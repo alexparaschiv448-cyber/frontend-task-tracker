@@ -5,7 +5,7 @@ import FetchWrapper from "../assets/FetchWrapper.jsx";
 import { useParams } from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import Input from "./Input.jsx";
-import {statuses} from "../assets/ProjectSettings.jsx";
+import {statuses,priorities} from "../assets/ProjectSettings.jsx";
 import Description from "./Description.jsx";
 import TasksSearchBar from "./TasksSearchBar.jsx";
 import ProjectList from "./ProjectList.jsx";
@@ -38,8 +38,6 @@ export default function ProjectEditForm() {
 
 
 
-    const statuses = ["Any","New","In Progress","Done"];
-    const priorities = ["Any","0 - Highest","1 - High","2 - Medium","3 - Low","4 - Lowest"];
     const [order, setOrder] = useState("ASC");
     const [taskStatus, setTaskStatus] = useState("Any");
     const [taskPriority, setTaskPriority] = useState("Any");
@@ -247,8 +245,6 @@ export default function ProjectEditForm() {
     }
 
 
-
-
     return(
         <>
             <form onSubmit={(e) => e.preventDefault()}>
@@ -326,10 +322,10 @@ export default function ProjectEditForm() {
                                 if(e.currentTarget.value>12 || e.currentTarget.value<1){setPageLimit(1);}
                                 else{setPageLimit(e.currentTarget.value);}
                             }} onChangeStatus={(e)=>{
-                                if(statuses.includes(e.target.value)){setTaskStatus(e.target.value);}
+                                if(Object.values(statuses).includes(e.target.value)){setTaskStatus(e.target.value);}
                                 else{setTaskStatus("Any");}
                             }} onChangePriority={(e)=>{
-                                if(priorities.includes(e.target.value)){setTaskPriority(e.target.value);}
+                                if(Object.values(priorities).includes(e.target.value)){setTaskPriority(e.target.value);}
                                 else{setTaskPriority("Any");}
                             }} onChangeTitle={(e)=>{
                                 setTaskTitle(e.target.value);

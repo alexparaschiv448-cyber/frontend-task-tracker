@@ -6,7 +6,6 @@ export default function PageLayout({minHeight="min-h-screen",children}) {
     const {loading_status}= useContext(context);
     const [loading,setLoading]=loading_status;
     const height=minHeight.split("-")[1]+"-"+minHeight.split("-")[2];
-    console.log(height);
     return(
         <>
             <NavBar/>

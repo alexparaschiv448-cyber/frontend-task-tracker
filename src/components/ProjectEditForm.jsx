@@ -48,7 +48,6 @@ export default function ProjectEditForm() {
     const [pageLimit,setPageLimit] = useState(12);
     const [limit, setLimit] = useState(0);
     const [sendSearch,setSendSearch] = useState(false);
-    //const [load, setLoad] = useState(true);
 
     const [tasks,setTasks] = useState([]);
 
@@ -216,10 +215,6 @@ export default function ProjectEditForm() {
         }
         fetchData();
     }, [page,sendSearch]);
-
-    useEffect(() => {
-        console.log(tasks);
-    },[tasks]);
 
 
     function handleClickDelete(){

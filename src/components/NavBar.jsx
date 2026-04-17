@@ -39,6 +39,7 @@ export default function NavBar(){
                         }, 2000);
                     }} text="Logout"/>
                     <NavButton clickHandler={()=>{nav("/me");}} text="Profile"/>
+                    <NavButton clickHandler={()=>{nav("/projects");}} text="Projects"/>
                 </div>
 
                 <div className="text-right text-white">

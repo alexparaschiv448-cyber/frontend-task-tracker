@@ -36,6 +36,9 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
     function validateEmail(email){
         if(email.length>30){
             return "Email too long!";
@@ -57,9 +60,15 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
+
+
+
     useEffect(() => {
         async function checkEmail() {
-            const r= await FetchWrapper("http://localhost:8000/checkemail/"+email);
+            const r= await FetchWrapper("/checkemail/"+email);
             setData(r.result.unique);
 
         }
@@ -72,12 +81,17 @@ export default function RegisterForm() {
             controller.abort();
         };
     }, [email]);
+
+
+
+
+
     function handleClick(){
         if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data){
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const r=await FetchWrapper("http://localhost:8000/auth/register",
+                    const r=await FetchWrapper("/auth/register",
                         "POST",
                         {
                             "Content-Type": "application/json",

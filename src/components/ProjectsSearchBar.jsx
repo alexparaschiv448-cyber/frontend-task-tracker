@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function FilterBar({onClickButton,onClickOrder,onChangeNumber,onChangeStatus,onChangeName,order,pageLimit,onClickSearch}) {
 
     return (
-        <div className="w-full h-[7%] bg-blue-100 flex items-center px-6 gap-6 shadow-sm">
+        <div className="w-full h-[70px] bg-blue-100 flex items-center px-6 gap-6 shadow-sm">
 
             {/* Status Dropdown */}
             <select

@@ -12,7 +12,7 @@ export default function PageLayout({minHeight="min-h-screen",children}) {
             <Loading visible={loading} />
             <div className={minHeight+" flex justify-center items-start"}>
 
-                <div className={height+" w-[90%] min-h-screen bg-white p-6 relative"}>
+                <div className={height+" "+minHeight+" w-[90%] bg-white p-6 relative"}>
                     {children}
                 </div>
 

@@ -11,6 +11,7 @@ import Projects from "./pages/Projects.jsx";
 import ProjectCreate from "./pages/ProjectCreate.jsx";
 import ProjectView from "./pages/ProjectView.jsx";
 import TaskCreate from "./pages/TaskCreate.jsx";
+import TaskView from "./pages/TaskView.jsx";
 
 export default function App() {
     return (
@@ -30,6 +31,7 @@ export default function App() {
                     <Route path="/project" element={<AuthCheck><ProjectCreate /></AuthCheck>} />
                     <Route path="/project/:id" element={<AuthCheck><ProjectView /></AuthCheck>} />
                     <Route path="/task" element={<AuthCheck><TaskCreate /></AuthCheck>} />
+                    <Route path="/task/:id" element={<AuthCheck><TaskView /></AuthCheck>} />
                     <Route path="*" element={<AuthCheck><Error /></AuthCheck>} />
 
                 </Routes>

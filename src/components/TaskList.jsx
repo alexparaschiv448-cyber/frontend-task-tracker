@@ -1,4 +1,6 @@
 import React from "react";
+import {Link} from "react-router-dom";
+
 
 const getStatusStyles = (status) => {
     switch (status) {
@@ -42,7 +44,10 @@ const TaskList = ({ tasks }) => {
     return (
         <div className="flex flex-wrap w-full">
             {tasks.map((task, index) => (
+
                 <div key={index} className="w-1/3 p-2 box-border">
+                    <Link to={`/task/${task.id}`} state={{"projectid":task.projectid}} >
+
                     <div
                         className="bg-white rounded-lg p-4 h-[180px] flex flex-col justify-between"
                         style={{
@@ -87,6 +92,7 @@ const TaskList = ({ tasks }) => {
                             {task.description}
                         </div>
                     </div>
+                    </Link>
                 </div>
             ))}
         </div>

@@ -5,6 +5,7 @@ import PageLayout from "../components/PageLayout.jsx";
 import {useNavigate} from "react-router-dom";
 import {user_context} from "../components/AuthCheck.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
+import ProjectsChart from "../components/ProjectsChart.jsx";
 
 export default function Dashboard() {
     const nav=useNavigate();
@@ -89,26 +90,7 @@ export default function Dashboard() {
     return(
         <>
             <PageLayout>
-                <button onClick={HandleClick}>Set test</button>
-                <br/>
-                <button onClick={()=>{sessionStorage.clear();
-                    setName("");
-                    setEmail("");
-                    setLoading(false);
-                }}>Remove test</button>
-                <br/>
-                <button onClick={CheckAuth}>Check test</button>
-                <br/>
-                <br/>
-                <br/>
-                <button>Check fetch wrapper</button>
-                <h1>User is: {name? name:''}</h1>
-                {name ? <h1>Welcome {name}!</h1> : <h1>Welcome guest!</h1>}
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <button onClick={()=>{setLoading(true)}}>Test loading</button>
+            <ProjectsChart />
             </PageLayout>
         </>
     )

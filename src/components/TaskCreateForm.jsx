@@ -1,5 +1,5 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {use, useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {statuses,priorities} from "../assets/ProjectSettings.jsx";
 import {context} from "./Context.jsx";
 import Input from "./Input.jsx";
@@ -11,13 +11,11 @@ export default function TaskCreateForm() {
 
     let nav=useNavigate();
     let location=useLocation();
-    const {projectId}=location.state || {};
+    const {projectId,parentId}=location.state || {};
     const [taskTitle, setTaskTitle] = useState("");
     const [taskDescription, setTaskDescription] = useState("");
     const [taskStatus, setTaskStatus] = useState(statuses.NEW);
-    const [parentId, setParentId] = useState(0);
     const [taskPriority, setTaskPriority] = useState("4 - Lowest");
-    console.log("ProjectId: " + projectId);
 
 
 
@@ -36,7 +34,6 @@ export default function TaskCreateForm() {
     const [validDate, setValidDate] = useState(true);
 
     function validateDatetime(due){
-        console.log(now);
         if(now>due){return "Due date must not be in the past!"}
         else{return false;}
     }
@@ -82,27 +79,15 @@ export default function TaskCreateForm() {
         //const date = new Date(duedate).toISOString();
         async function createTask(){
             try {
-                if(taskDescription){
-                    const results = await FetchWrapper("/tasks",
-                        "POST",
-                        {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                        },
-                        {
-                            title: taskTitle, description: taskDescription, status: taskStatus, priority: taskPriority,projectId: projectId,dueDate:duedate
-                        });
-                }else{
-                    const results = await FetchWrapper("/tasks",
-                        "POST",
-                        {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                        },
-                        {
-                            title: taskTitle, status: taskStatus, priority: taskPriority,projectId: projectId,dueDate:duedate
-                        });
-                }
+                let body={title: taskTitle, status: taskStatus, priority: taskPriority,projectId: projectId,dueDate:duedate}
+                if(taskDescription){body={...body,description:taskDescription}}
+                if(parentId){body={...body,parentId:parentId}}
+                const results = await FetchWrapper("/tasks",
+                    "POST",
+                    {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
+                    },body);
                 setMessage("Task created!");
                 setStatus("success");
                 setCanSubmit(false);
@@ -175,7 +160,7 @@ export default function TaskCreateForm() {
               <br/>
               <br/>
               <label className="ml-4">Due Date:</label>
-              <input  type={"datetime-local"} value={duedate || ""} onChange={(e) => {setDuedate(e.target.value);console.log(e.target.value);}}/>
+              <input  type={"datetime-local"} value={duedate || ""} onChange={(e) => {setDuedate(e.target.value);}}/>
               {validateDatetime(duedate) ?  <p className="text-sm text-gray-500 mt-1 h-5 ml-4">
                   {validateDatetime(duedate)}
               </p> : <br/>}

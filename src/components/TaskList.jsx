@@ -1,5 +1,5 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link,useNavigate} from "react-router-dom";
 
 
 const getStatusStyles = (status) => {
@@ -40,13 +40,13 @@ const TaskList = ({ tasks }) => {
             </div>
         );
     }
-
+    const nav=useNavigate();
     return (
         <div className="flex flex-wrap w-full">
             {tasks.map((task, index) => (
 
                 <div key={index} className="w-1/3 p-2 box-border">
-                    <Link to={`/task/${task.id}`} state={{"projectid":task.projectid}} >
+
 
                     <div
                         className="bg-white rounded-lg p-4 h-[180px] flex flex-col justify-between"
@@ -58,9 +58,14 @@ const TaskList = ({ tasks }) => {
                         {/* TOP SECTION */}
                         <div className="relative h-1/3">
                             {/* Title */}
+                            <Link to={`/task/${task.id}`} state={{"projectid":task.projectid}} >
                             <div className="text-center font-semibold text-gray-900">
                                 {task.title}
                             </div>
+                            </Link>
+                            <button onClick={()=>{nav("/task",{state:{projectId:task.projectid,parentId:task.id}})}} className="btn-xs bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 rounded-lg transition duration-200 absolute left-0 top-0 cursor-pointer">
+                                Create Subtask
+                            </button>
 
                             {/* Due date */}
                             <div className="absolute right-0 top-0 text-xs text-gray-500">
@@ -92,7 +97,6 @@ const TaskList = ({ tasks }) => {
                             {task.description}
                         </div>
                     </div>
-                    </Link>
                 </div>
             ))}
         </div>

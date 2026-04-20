@@ -59,10 +59,11 @@ export default function TaskEditForm(){
 
     function validateDatetime(due){
         if(due===initialDueDate){return false;}
-        console.log(now);
         if(now>due){return "Due date must not be in the past!"}
         else{return false;}
     }
+
+
 
     function validateTitle(title){
         if(title.length>50){
@@ -102,7 +103,6 @@ export default function TaskEditForm(){
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     });
-                console.log(results);
                 if(results.status===401){
                     sessionStorage.clear();
                     nav("/login");
@@ -179,13 +179,9 @@ export default function TaskEditForm(){
 
 
 
-    useEffect(()=>{
-        console.log(searchResult);
-    },[searchResult]);
 
-    useEffect(()=>{
-        console.log("dropdown: ",taskParentName);
-    }, [taskParentName]);
+
+
 
     const handleSelect = (value) => {
 
@@ -195,6 +191,9 @@ export default function TaskEditForm(){
         setShowDropdown(false);
         ref.current.blur();
     };
+
+
+
 
     function handleClick(){
         setLoading(true);
@@ -208,7 +207,6 @@ export default function TaskEditForm(){
         if(taskParentId===null){
             body={...body,parentId:null};
         }
-        console.log(body);
         const sendUpdateRequest = async () => {
             try {
                 const results = await FetchWrapper("/tasks/"+id,
@@ -219,6 +217,8 @@ export default function TaskEditForm(){
                 if(results.status===401) {
                     sessionStorage.clear();
                     nav("/login");
+                }else if(results.status===422 && results.result.message==="Circular parent relation!"){
+                    throw new Error("Circular relation detected! Choose another parent!");
                 }else if(results.status===200){
                     setInitialDescription(taskDescription);
                     setInitialStatus(taskStatus);
@@ -255,6 +255,8 @@ export default function TaskEditForm(){
     }
 
 
+
+
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (ref.current && !ref.current.contains(e.target)) {
@@ -266,11 +268,47 @@ export default function TaskEditForm(){
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        console.log("parent name:",taskParentName);
-        console.log("initial name:",initialParentName);
-        console.log("true name:",trueParentName);
-    }, [taskParentName,trueParentName,initialParentName]);
+
+
+
+
+
+
+    function handleClickDelete(){
+        setLoading(true);
+        const sendDeleteRequest = async () => {
+            try {
+                const results = await FetchWrapper("/tasks/"+id,
+                    "DELETE",
+                    {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`},{},
+                    "?projectid="+projectid
+                );
+                setReadOnlyTitle(true);
+                setReadOnlyDescription(true);
+                setReadOnlyStatus(true);
+                setReadOnlyPriority(true);
+                setReadOnlyParentName(true);
+                setReadOnlyDueDate(true);
+                setCanSubmit(false);
+                setShowDropdown(false);
+                setMessage("task deleted!");
+                setStatus("success");
+                setTimeout(() => {
+                    setMessage("");setStatus("");nav(`/project/${projectid}`);
+                }, 2000);
+
+            }catch (error){
+                setMessage("Error: "+error.message);
+                setStatus("error");
+                setTimeout(() => {
+                    setMessage("");setStatus("");
+                }, 3000);
+            }finally{setLoading(false);}
+        }
+        sendDeleteRequest();
+    }
+
+
 
     return(
         <>
@@ -408,7 +446,12 @@ export default function TaskEditForm(){
                 <br/>
                 <br/>
                 {canSubmit && <button type="submit" onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Submit</button>}
-
+                <br/>
+                <br/>
+                <button onClick={()=>{
+                    const result = window.confirm("Are you sure you want to delete this task?");
+                    if (result) {handleClickDelete();}
+                }} className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">DELETE TASK</button>
             </form>
 
         </>

@@ -63,7 +63,7 @@ export default function ProjectEditForm() {
 
 
     function validateDescription(description){
-        if(description.length>1000){
+        if(description && description.length>1000){
             return "Description too long!";
         }
         return false;
@@ -99,10 +99,8 @@ export default function ProjectEditForm() {
                 }else if(results.status===404){
                     nav("/error");
                 }else if(results.status===200){
-                    if(results.result.description!=="None"){
-                        setProjectDescription(results.result.description);
-                        setInitialDescription(results.result.description);
-                    }
+                    setProjectDescription(results.result.description);
+                    setInitialDescription(results.result.description);
                     setProjectName(results.result.name);
                     setInitialName(results.result.name);
                     setProjectStatus(results.result.status);
@@ -307,14 +305,14 @@ export default function ProjectEditForm() {
                 <br/>
                 <br/>
                 <button onClick={()=>{
-                    const result = window.confirm("Are you sure you want to delete this project?");
+                    const result = window.confirm("Are you sure you want to delete this project? All of its tasks will be deleted!");
                     if (result) {handleClickDelete();}
                 }} className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">DELETE PROJECT</button>
             </form>
             <br/>
             <br/>
             <br/>
-            <TasksSearchBar onClickButton={()=>{nav("/task",{state:{projectId:id}});}}
+            <TasksSearchBar onClickButton={()=>{nav("/task",{state:{projectId:id,parentId:null}});}}
                             onClickDue={()=>{
                                 if(order === "DESC"){setOrder("ASC")}
                                 else{setOrder("DESC")}

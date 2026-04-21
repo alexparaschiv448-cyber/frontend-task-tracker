@@ -8,7 +8,7 @@ export default function FilterBar({onClickButton,onClickOrder,onChangeNumber,onC
             {/* Status Dropdown */}
             <select
                 onChange={onChangeStatus}
-                className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-md focus:outline-none"
+                className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-md focus:outline-none w-[130px]"
             >
                 <option>Any</option>
                 <option>New</option>

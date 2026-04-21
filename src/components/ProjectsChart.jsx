@@ -1,16 +1,119 @@
 import 'flowbite';
-import ApexCharts from 'apexcharts';
 import Chart from "react-apexcharts";
 import { Card } from "flowbite-react";
+import {useContext, useEffect, useState} from "react";
+import FetchWrapper from "../assets/FetchWrapper.jsx";
+import {context} from "./Context.jsx";
+import {useNavigate} from "react-router-dom";
+
+export default function ProjectsChart() {
+
+    let nav=useNavigate();
+    const newColor="#7e7e7e";
+    const inProgressColor = "#0048ff";
+    const doneColor = "#0aca00";
+    const [statusesNew,setStatusesNew] = useState([]);
+    const [statusesInProgress,setStatusesInProgress] = useState([]);
+    const [statusesDone,setStatusesDone] = useState([]);
+    const [newTotal,setNewTotal] = useState(0);
+    const [inProgressTotal,setInProgressTotal] = useState(0);
+    const [doneTotal,setDoneTotal] = useState(0);
 
 
-export default function ProjectsChart(){
+    const {toast_message,message_status,loading_status}=useContext(context);
+    const [loading, setLoading] = loading_status;
+    const [message,setMessage]=toast_message;
+    const [status,setStatus]=message_status;
 
-    const brandColor = "#0048ff";
-    const brandSecondaryColor = "#8efa86";
+    //const yAxisIncrement=10;
+    const [yAxisIncrement,setYAxisIncrement] = useState(20);
 
+
+    useEffect(() => {
+        if(sessionStorage.getItem('authorization')) {
+            setLoading(true);
+            async function fetchProjectData() {
+                try {
+                    const results = await FetchWrapper("/dashboard/statuses",
+                        "GET",
+                        {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
+                        });
+                    if (results.status === 401) {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status === 404) {
+                        nav("/error");
+                    } else if (results.status === 200) {
+                        setStatusesNew(results.result.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
+                        setStatusesInProgress(results.result.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
+                        setStatusesDone(results.result.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
+                        let sum=0;
+                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].new}
+                        setNewTotal(sum);
+                        sum=0;
+                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].in_progress}
+                        setInProgressTotal(sum);
+                        sum=0;
+                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].done}
+                        setDoneTotal(sum);
+
+                    }
+
+                } catch (error) {
+                    setMessage("Error: " + error.message);
+                    setStatus("error");
+                    setTimeout(() => {
+                        setMessage("");
+                        setStatus("");
+                    }, 3000);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            fetchProjectData();
+        }
+    },[])
+
+
+
+    const data = [
+        {
+            name: "New",
+            color: newColor,
+            data: statusesNew,
+        },
+        {
+            name: "In Progress",
+            color: inProgressColor,
+            data: statusesInProgress,
+        },
+        {
+            name: "Done",
+            color: doneColor,
+            data: statusesDone,
+        }
+    ];
+
+    const barWidth = 150;
+    const chartWidth = data[0].data.length * barWidth;
+
+    const allValues = data.flatMap(s => s.data.map(d => d.y));
+
+    const rawMax = Math.max(...allValues);
+
+    const maxY = Math.ceil(rawMax / yAxisIncrement) * yAxisIncrement;
+
+    const tickCount = maxY / yAxisIncrement;
+
+    const yTicks = Array.from({ length: tickCount + 1 }, (_, i) =>
+        maxY - i * yAxisIncrement
+    );
     const options = {
-        colors: [brandColor, brandSecondaryColor],
+        colors: [newColor, inProgressColor, doneColor],
+
         chart: {
             type: "bar",
             height: 320,
@@ -18,209 +121,128 @@ export default function ProjectsChart(){
             toolbar: {
                 show: false,
             },
-
         },
+
         plotOptions: {
             bar: {
                 horizontal: false,
-                columnWidth: "70%",
-                borderRadiusApplication: "end",
-                borderRadius: 8,
+                columnWidth: "50%",
+                borderRadius: 0,
             },
         },
+
         tooltip: {
             shared: true,
             intersect: false,
-            style: {
-                fontFamily: "Inter, sans-serif",
-            },
         },
-        states: {
-            hover: {
-                filter: {
-                    type: "darken",
-                    value: 1,
-                },
-            },
-        },
+
         stroke: {
             show: true,
             width: 3,
             colors: ["transparent"],
         },
+
         grid: {
             show: true,
             strokeDashArray: 4,
-            padding: {
-                left: 2,
-                right: 2,
-                top: -14
-            },
         },
+
         dataLabels: {
             enabled: false,
         },
+
         legend: {
-            show: true,
+            show: false,
         },
+
         xaxis: {
-            floating: false,
             labels: {
-                rotate: -45,
-                rotateAlways: true,
-                hideOverlappingLabels: false,
+                rotate: 0,
                 trim: false,
-                show: true,
                 style: {
                     fontFamily: "Inter, sans-serif",
-                    cssClass: 'text-xs font-normal fill-body'
-                }
-            },
-            axisBorder: {
-                show: true,
-            },
-            axisTicks: {
-                show: true,
+                },
             },
         },
+
         yaxis: {
-            show: true,
+            show: false,
+            min: 0,
+            max: maxY,
+            tickAmount: tickCount,
+            labels: {
+                formatter: (val) => val,
+            },
         },
+
         fill: {
             opacity: 1,
         },
-    }
+    };
 
-    const data= [
-        {
-            name: "Organic",
-            color: brandColor,
-            data: [
-                { x: "Mon", y: 231 },
-                { x: "Tue", y: 122 },
-                { x: "Wed", y: 63 },
-                { x: "Thu", y: 421 },
-                { x: "Fri", y: 122 },
-                { x: "Sat", y: 323 },
-                { x: "Sun", y: 111 },
-                { x: "Sun", y: 111 },
-                { x: "Sun", y: 111 },
-                { x: "Sun", y: 111 },
-                { x: "Sun", y: 111 },
-                { x: "Sun", y: 111 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
-            ],
-        },
-        {
-            name: "Social media",
-            color: brandSecondaryColor,
-            data: [
-                { x: "Mon", y: 232 },
-                { x: "Tue", y: 113 },
-                { x: "Wed", y: 341 },
-                { x: "Thu", y: 224 },
-                { x: "Fri", y: 522 },
-                { x: "Sat", y: 411 },
-                { x: "Sun", y: 243 },
-                { x: "Sun", y: 243 },
-                { x: "Sun", y: 243 },
-                { x: "Sun", y: 243 },
-                { x: "Sun", y: 243 },
-                { x: "Sun", y: 243 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
-                { x: "Fri", y: 122 },
+    return (
+        <div className="absolute top-50 w-[48%] bg-neutral-primary-soft border border-default rounded-base shadow-md p-4 md:p-6 inline-block">
 
-            ],
-        },
-    ]
-    const barWidth = 80;
-    const chartWidth = data[0].data.length * barWidth;
+            {/* HEADER */}
+            <div className="flex justify-between pb-4 mb-4 border-b border-light">
+                <div>Projects</div>
 
-
-
-    return(
-        <>
-            <div className="  w-[50%] bg-neutral-primary-soft border border-default rounded-base shadow-xs p-4 md:p-6">
-                <div className="flex justify-between pb-4 mb-4 border-b border-light">
-                    <div className="flex items-center">
-                        Projects
-                    </div>
-                    <div>
-              <span
-                  className="inline-flex items-center bg-success-soft border border-success-subtle text-fg-success-strong text-xs font-medium px-1.5 py-0.5 rounded">
-                <svg className="w-4 h-4 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                     fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                                           strokeWidth="2" d="M12 6v13m0-13 4 4m-4-4-4 4"/></svg>
-                42.5%
-              </span>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2">
-                    <dl className="flex items-center">
-                        <dt className="text-body text-sm font-normal me-1">Progress</dt>
-                    </dl>
-                </div>
-                <Card><div id="column-chart" className="overflow-x-auto scroll-smooth" ><div style={{ minWidth: chartWidth}}><Chart options={options} series={data} type={"bar"} height={500}/></div></div></Card>
-                <div className="grid grid-cols-1 items-center border-light border-t justify-between">
-                    <div className="flex justify-between items-center pt-4 md:pt-6">
-                        <button id="dropdownLastDaysButton" data-dropdown-toggle="LastDaysdropdown"
-                                data-dropdown-placement="bottom"
-                                className="text-sm font-medium text-body hover:text-heading text-center inline-flex items-center"
-                                type="button">
-                            Last 7 days
-                            <svg className="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                      strokeWidth="2" d="m19 9-7 7-7-7"/>
-                            </svg>
-                        </button>
-                        <div id="LastDaysdropdown"
-                             className="z-10 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44">
-                            <ul className="p-2 text-sm text-body font-medium" aria-labelledby="dropdownLastDaysButton">
-                                <li>
-                                    <a href="#"
-                                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Yesterday</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Today</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last
-                                        7 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last
-                                        30 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                       className="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last
-                                        90 days</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <a href="#"
-                           className="inline-flex items-center text-fg-brand bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm px-3 py-2 focus:outline-none">
-                            Leads Report
-                            <svg className="w-4 h-4 ms-1.5 -me-0.5 rtl:rotate-180" aria-hidden="true"
-                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                 viewBox="0 0 24 24">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                                      strokeWidth="2" d="M19 12H5m14 0-4 4m4-4-4-4"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+                <span className="inline-flex items-center bg-gray-400 border border-gray-500 text-xs px-1.5 py-0.5 rounded">
+                  {newTotal+doneTotal+inProgressTotal>0 ? ((newTotal*100)/(newTotal+inProgressTotal+doneTotal)).toFixed(2) : 0}%
+                </span>
+                <span className="inline-flex items-center bg-blue-500 border border-blue-700 text-xs px-1.5 py-0.5 rounded text-white">
+                  {newTotal+doneTotal+inProgressTotal>0 ? ((inProgressTotal*100)/(newTotal+inProgressTotal+doneTotal)).toFixed(2) : 0}%
+                </span>
+                <span className="inline-flex items-center bg-success-soft border border-success-subtle text-xs px-1.5 py-0.5 rounded">
+                  {newTotal+doneTotal+inProgressTotal>0 ? ((doneTotal*100)/(newTotal+inProgressTotal+doneTotal)).toFixed(2) : 0}%
+                </span>
             </div>
-        </>
-    )
+
+            {/* LEGEND */}
+            <Card className="mb-4 relative">
+                <input value={yAxisIncrement} type={"number"} className="absolute top-12 right-5 w-[80px] bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none text-center" min={1} max={100}
+                onChange={(e)=>{console.log("yes"); if(e.currentTarget.value>100 || e.currentTarget.value<1){setYAxisIncrement(1);}
+                else{setYAxisIncrement(e.currentTarget.value);}}} />
+                <div className="space-y-2">
+                    {data.map(series => (
+                        <div key={series.name} className="flex items-center gap-2">
+              <span
+                  className="w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: series.color }}
+              />
+                            <span className="text-sm text-body">
+                {series.name}
+              </span>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+
+            {/* CHART + CUSTOM Y AXIS */}
+            <div className="flex gap-3">
+
+                {/* Y AXIS */}
+                <Card className="w-14 h-[480px]">
+                    <div className="h-[440px] flex flex-col justify-between text-xs text-body">
+                        {yTicks.map((tick, i) => (
+                            <span key={i}>{tick}</span>
+                        ))}
+                    </div>
+                </Card>
+
+                {/* CHART */}
+                <div className="overflow-x-auto flex-1">
+                    <div style={{ minWidth: chartWidth }}>
+                        <Chart
+                            options={options}
+                            series={data}
+                            type="bar"
+                            height={500}
+                        />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
 }

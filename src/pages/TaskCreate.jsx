@@ -1,12 +1,12 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
-import TaskCreateForm from "../components/TaskCreateForm.jsx";
+import TaskForm from "../components/TaskForm.jsx";
 
 export default function TaskCreate() {
     return(
         <>
             <PageLayout>
-            <TaskCreateForm />
+            <TaskForm mode={"create"} />
             </PageLayout>
         </>
     )

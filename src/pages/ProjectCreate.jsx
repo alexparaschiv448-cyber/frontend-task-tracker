@@ -1,12 +1,12 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
-import CreateProjectForm from "../components/CreateProjectForm";
+import ProjectForm from "../components/ProjectForm.jsx";
 
 export default function Projects() {
     return(
         <>
             <PageLayout>
-            <CreateProjectForm />
+            <ProjectForm mode={"create"} />
             </PageLayout>
         </>
     )

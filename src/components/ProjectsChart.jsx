@@ -10,8 +10,8 @@ export default function ProjectsChart() {
 
     let nav=useNavigate();
     const newColor="#7e7e7e";
-    const inProgressColor = "#0048ff";
-    const doneColor = "#0aca00";
+    const inProgressColor = "#3672ff";
+    const doneColor = "#77ff73";
     const [statusesNew,setStatusesNew] = useState([]);
     const [statusesInProgress,setStatusesInProgress] = useState([]);
     const [statusesDone,setStatusesDone] = useState([]);

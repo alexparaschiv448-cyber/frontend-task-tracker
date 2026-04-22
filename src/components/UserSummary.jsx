@@ -64,12 +64,12 @@ export default function UserSummary(){
             <br/>
             <br/>
             <div className={"absolute bottom-8 left-10"}>Tasks Created: {taskCount}</div>
-            <button
+            { sessionStorage.getItem("authorization") && <button
                 className="text-blue-100 hover:text-white hover:bg-blue-800 px-4 py-2 rounded-md transition duration-200 bg-blue-600 absolute top-6 left-60"
                 onClick={()=>{nav("/project");}}
             >
                 Create Project
-            </button>
+            </button> }
         </Card>
         </>
     )

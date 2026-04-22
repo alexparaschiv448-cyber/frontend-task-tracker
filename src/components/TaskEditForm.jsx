@@ -242,7 +242,6 @@ export default function TaskEditForm(){
                         setMessage("");setStatus("");
                     }, 3000);
                 }
-
             }catch (error){
                 setMessage("Error: "+error.message);
                 setStatus("error");
@@ -387,7 +386,7 @@ export default function TaskEditForm(){
                 <br/>
                 <br/>
                 <label className="ml-4">Due Date:</label>
-                <input readOnly={readOnlyDueDate} type={"datetime-local"} value={taskDueDate || ""} onChange={(e) => {setTaskDueDate(e.target.value);console.log(e.target.value);}}/>
+                <input readOnly={readOnlyDueDate} type={"datetime-local"} value={taskDueDate || ""} onChange={(e) => {setTaskDueDate(e.target.value);}}/>
                 {readOnlyDueDate? <button onClick={() => {
                     setReadOnlyDueDate(false);
                 }} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">Edit

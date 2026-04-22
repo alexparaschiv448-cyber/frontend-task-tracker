@@ -1,12 +1,14 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
-import ProjectEditForm from "../components/ProjectEditForm";
+import ProjectForm from "../components/ProjectForm.jsx";
+import ProjectTasks from "../components/ProjectTasks.jsx";
 
 export default function Register() {
     return(
         <>
             <PageLayout minHeight={"min-h-[2000px]"}>
-            <ProjectEditForm />
+            <ProjectForm mode={"edit"} />
+            <ProjectTasks />
             </PageLayout>
         </>
     )

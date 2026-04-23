@@ -91,19 +91,22 @@ export default function ProjectForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code === "UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 404) {
+                    } else if (results.status === 404 && results.result.code === "NOT_FOUND") {
                         nav("/error");
-                    } else if (results.status === 200) {
-                        setProjectDescription(results.result.description);
-                        setInitialDescription(results.result.description);
-                        setProjectName(results.result.name);
-                        setInitialName(results.result.name);
-                        setProjectStatus(results.result.status);
-                        setInitialStatus(results.result.status);
-                        setProjectCreationDate(results.result.createdat);
+                    } else if (results.status === 200 && results.result.code === "PROJECT_FOUND") {
+                        setProjectDescription(results.result.data.description);
+                        setInitialDescription(results.result.data.description);
+                        setProjectName(results.result.data.name);
+                        setInitialName(results.result.data.name);
+                        setProjectStatus(results.result.data.status);
+                        setInitialStatus(results.result.data.status);
+                        setProjectCreationDate(results.result.data.createdat);
+                    } else if(results.status===403 && results.result.code==="FORBIDDEN"){
+                        sessionStorage.clear();
+                        nav("/login");
                     }
 
                 } catch (error) {
@@ -144,11 +147,13 @@ export default function ProjectForm({mode}) {
                         },
                         body
                     );
-                    if (results.status === 401) {
-
+                    if (results.status === 401 && results.result.code === "UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 200) {
+                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status === 200 && results.result.code==="PROJECT_UPDATED") {
                         setInitialDescription(projectDescription);
                         setInitialStatus(projectStatus);
                         setInitialName(projectName);
@@ -156,7 +161,7 @@ export default function ProjectForm({mode}) {
                         setReadOnlyDescription(true);
                         setReadOnlyStatus(true);
                         setCanSubmit(false);
-                        setMessage("Project updated!");
+                        setMessage(results.result.message);
                         setStatus("success");
                         setTimeout(() => {
                             setMessage("");
@@ -181,33 +186,38 @@ export default function ProjectForm({mode}) {
                 setLoading(true);
                 async function createProject(){
                     try {
+                        let body;
                         if(projectDescription){
-                            const results = await FetchWrapper("/projects",
-                                "POST",
-                                {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                                },
-                                {
+                            body= {
                                     name: projectName, description: projectDescription, status: projectStatus,
-                                })
+                                };
                         }else{
-                            const results = await FetchWrapper("/projects",
-                                "POST",
-                                {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                                },
-                                {
+                            body={
                                     name: projectName, status: projectStatus,
-                                })
+                                };
                         }
-                        setMessage("Project created!");
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");setStatus("")
-                            nav("/projects");
-                        }, 2000);
+                        const results = await FetchWrapper("/projects",
+                            "POST",
+                            {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
+                            },body)
+                        if(results.status===200 && results.result.code==="PROJECT_CREATED") {
+                            setMessage(results.result.message);
+                            setStatus("success");
+                            setTimeout(() => {
+                                setMessage("");
+                                setStatus("")
+                                nav("/projects");
+                            }, 2000);
+                        } else if(results.status===401 && results.result.code==="UNAUTHORIZED") {
+                            setMessage(results.result.message);
+                            setStatus("error");
+                            setTimeout(() => {
+                                setMessage("");
+                                setStatus("")
+                            }, 3000);
+                        }
                     }catch(error){
                         setMessage("Error: "+error.message);
                         setStatus("error");
@@ -243,18 +253,25 @@ export default function ProjectForm({mode}) {
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         }
                     );
-                    setReadOnlyStatus(true);
-                    setReadOnlyName(true);
-                    setReadOnlyDescription(true);
-                    setCanSubmit(false);
-                    setMessage("project deleted!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                        nav("/projects");
-                    }, 2000);
-
+                    if (results.status === 200 && results.result.code==="PROJECT_DELETED") {
+                        setReadOnlyStatus(true);
+                        setReadOnlyName(true);
+                        setReadOnlyDescription(true);
+                        setCanSubmit(false);
+                        setMessage(results.result.message);
+                        setStatus("success");
+                        setTimeout(() => {
+                            setMessage("");
+                            setStatus("");
+                            nav("/projects");
+                        }, 2000);
+                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    }
                 } catch (error) {
                     setMessage("Error: " + error.message);
                     setStatus("error");

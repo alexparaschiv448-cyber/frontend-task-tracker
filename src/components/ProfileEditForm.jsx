@@ -45,12 +45,18 @@ export default function RegisterForm() {
         }
 
     }, [inputEmail]);
+
+
+
     useEffect(()=>{
         if((inputFirstName!==name.split(" ")[0] || inputLastName!==name.split(" ")[1] || inputEmail!==email) && inputEmail && inputLastName && inputFirstName && !validateEmail(inputEmail) && !validateName(inputFirstName) && !validateName(inputLastName)){
             setCanSubmit(true);
         }
         else{setCanSubmit(false);}
     },[inputEmail,inputFirstName,inputLastName])
+
+
+
     function validateName(name){
         if(name.length>30){
             return "Name too long!";
@@ -95,18 +101,27 @@ export default function RegisterForm() {
                             email:inputEmail,firstname:inputFirstName,lastname:inputLastName
                         }
                         );
-                    sessionStorage.setItem("authorization", results.result.token);
-                    setName(results.result.firstname+" "+results.result.lastname);
-                    setEmail(results.result.email);
-                    setReadonlyEmail(true);
-                    setReadonlyLast(true);
-                    setReadonlyFirst(true);
-                    setCanSubmit(false);
-                    setMessage("Profile updated!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");setStatus("")
-                    }, 3000);
+                    if(results.status===200 && results.result.code==="USER_UPDATED") {
+                        sessionStorage.setItem("authorization", results.result.data.token);
+                        setName(results.result.data.firstname + " " + results.result.data.lastname);
+                        setEmail(results.result.data.email);
+                        setReadonlyEmail(true);
+                        setReadonlyLast(true);
+                        setReadonlyFirst(true);
+                        setCanSubmit(false);
+                        setMessage(results.result.message);
+                        setStatus("success");
+                        setTimeout(() => {
+                            setMessage("");
+                            setStatus("")
+                        }, 3000);
+                    } else if (results.status===403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status===401 && results.result.code==="UNAUTHORIZED") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    }
 
                 }catch (error){
                     setMessage("Error: "+error.message);
@@ -118,7 +133,7 @@ export default function RegisterForm() {
             }
             sendPostRequest();
         }else{
-            setMessage("Invalid data!");
+            setMessage("Existing email address!");
             setStatus("error");
             setTimeout(() => {
                 setMessage("");setStatus("");
@@ -137,15 +152,23 @@ export default function RegisterForm() {
                     "DELETE",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`}
                 );
-                sessionStorage.removeItem("authorization");
-                setReadonlyEmail(true);
-                setReadonlyLast(true);
-                setReadonlyFirst(true);
-                setMessage("User deleted!");
-                setStatus("success");
-                setTimeout(() => {
-                    setMessage("");setStatus("");nav("/");
-                }, 2000);
+                if(results.status===200 && results.result.code==="USER_DELETED") {
+                    sessionStorage.removeItem("authorization");
+                    setReadonlyEmail(true);
+                    setReadonlyLast(true);
+                    setReadonlyFirst(true);
+                    setMessage(results.result.message);
+                    setStatus("success");
+                    setTimeout(() => {
+                        setMessage("");setStatus("");nav("/");
+                    }, 2000);
+                } else if (results.status===403 && results.result.code==="FORBIDDEN") {
+                    sessionStorage.clear();
+                    nav("/login");
+                } else if (results.status===401 && results.result.code==="UNAUTHORIZED") {
+                    sessionStorage.clear();
+                    nav("/login");
+                }
 
             }catch (error){
                 setMessage("Error: "+error.message);

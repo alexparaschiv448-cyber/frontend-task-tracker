@@ -30,11 +30,11 @@ export default function AuthCheck({children}){
                 if (results.status===401) {
                         sessionStorage.clear();
                         nav("/login");
-                }else{
-                    setName(results.result.firstname+" "+results.result.lastname);
-                    setEmail(results.result.email);
-                    setId(results.result.id);
-                    setCreated_at(results.result.createdat);
+                }else if(results.status===200){
+                    setName(results.result.data.firstname+" "+results.result.data.lastname);
+                    setEmail(results.result.data.email);
+                    setId(results.result.data.id);
+                    setCreated_at(results.result.data.createdat);
                 }
                 setLoading(false);
             }

@@ -46,12 +46,18 @@ export default function ProjectTasks() {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                if (results.result.length > 0) {
-                    setLimit(results.result[0].limit);
-                    setTasks(results.result);
-                    if (page > Math.ceil(results.result[0].limit / pageLimit)) {
-                        setPage(Math.ceil(results.result[0].limit / pageLimit));
+                if (results.status === 200 && results.result.code==="TASKS_RETURNED") {
+                    setLimit(results.result.data[0].limit);
+                    setTasks(results.result.data);
+                    if (page > Math.ceil(results.result.data[0].limit / pageLimit)) {
+                        setPage(Math.ceil(results.result.data[0].limit / pageLimit));
                     }
+                } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    sessionStorage.clear();
+                    nav("/login");
+                } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    sessionStorage.clear();
+                    nav("/login");
                 } else {
                     setLimit(0);
                     setTasks([]);

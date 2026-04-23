@@ -53,18 +53,18 @@ export default function LoginForm() {
 
                     setLoading(false);
 
-                    if('message' in r.result){
-                        setMessage("Invalid data!");
+                    if(r.status===404 && r.result.code==="NOT_FOUND"){
+                        setMessage(r.result.message);
                         setStatus("error");
                         setTimeout(() => {
                             setMessage("");setStatus("");
                         }, 3000);
-                    }else{
-                        setMessage("User successfully logged in!");
+                    }else if(r.status===200 && r.result.code==="AUTHORIZED"){
+                        setMessage(r.result.message);
                         setStatus("success");
                         setTimeout(() => {
                             setMessage("");setStatus("");
-                            sessionStorage.setItem("authorization",r.result.token);
+                            sessionStorage.setItem("authorization",r.result.data.token);
                             nav("/");
                         }, 2000);
                     }
@@ -81,7 +81,7 @@ export default function LoginForm() {
             };
             sendPostRequest();
         }else{
-            setMessage("Invalid data!");
+            setMessage("Invalid user credentials!");
             setStatus("error");
             setTimeout(() => {
                 setMessage("");setStatus("");

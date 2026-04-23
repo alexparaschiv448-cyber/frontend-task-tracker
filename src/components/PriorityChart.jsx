@@ -44,20 +44,20 @@ export default function ProjectsChart() {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 404) {
+                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
                         nav("/error");
-                    } else if (results.status === 200) {
-                        const total=results.result[0].highest+results.result[0].high+results.result[0].medium+results.result[0].low+results.result[0].lowest;
+                    } else if (results.status === 200 && results.result.code==="RETURNED") {
+                        const total=results.result.data[0].highest+results.result.data[0].high+results.result.data[0].medium+results.result.data[0].low+results.result.data[0].lowest;
                         console.log("total: ",total);
                         if(total>0){
-                            setHighest((results.result[0].highest*100)/total);
-                            setHigh((results.result[0].high*100)/total);
-                            setMedium((results.result[0].medium*100)/total);
-                            setLow((results.result[0].low*100)/total);
-                            setLowest((results.result[0].lowest*100)/total);
+                            setHighest((results.result.data[0].highest*100)/total);
+                            setHigh((results.result.data[0].high*100)/total);
+                            setMedium((results.result.data[0].medium*100)/total);
+                            setLow((results.result.data[0].low*100)/total);
+                            setLowest((results.result.data[0].lowest*100)/total);
                         }
                     }
                 } catch (error) {

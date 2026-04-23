@@ -30,14 +30,14 @@ export default function UserSummary(){
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 404) {
+                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
                         nav("/error");
-                    } else if (results.status === 200) {
-                        setProjectCount(results.result.project_count);
-                        setTaskCount(results.result.task_count);
+                    } else if (results.status === 200 && results.result.code==="RETURNED") {
+                        setProjectCount(results.result.data.project_count);
+                        setTaskCount(results.result.data.task_count);
                     }
                 } catch (error) {
                     setMessage("Error: " + error.message);

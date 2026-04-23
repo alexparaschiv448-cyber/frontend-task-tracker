@@ -40,23 +40,23 @@ export default function ProjectsChart() {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 404) {
+                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
                         nav("/error");
-                    } else if (results.status === 200) {
-                        setStatusesNew(results.result.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
-                        setStatusesInProgress(results.result.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
-                        setStatusesDone(results.result.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
+                    } else if (results.status === 200 && results.result.code==="RETURNED") {
+                        setStatusesNew(results.result.data.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
+                        setStatusesInProgress(results.result.data.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
+                        setStatusesDone(results.result.data.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
                         let sum=0;
-                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].new}
+                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].new}
                         setNewTotal(sum);
                         sum=0;
-                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].in_progress}
+                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].in_progress}
                         setInProgressTotal(sum);
                         sum=0;
-                        for(let i=0;i<results.result.length;i++){sum+=results.result[i].done}
+                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].done}
                         setDoneTotal(sum);
 
                     }

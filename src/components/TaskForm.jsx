@@ -147,6 +147,7 @@ export default function TaskForm({mode}) {
             setLoading(true);
 
             async function fetchTaskData() {
+                console.log("ID: ",id);
                 try {
                     const results = await FetchWrapper("/tasks/" + id,
                         "GET",
@@ -154,32 +155,38 @@ export default function TaskForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 200) {
-                        if (results.result.description) {
-                            setTaskDescription(results.result.description);
-                            setInitialDescription(results.result.description);
+                    } else if (results.status === 200 && results.result.code==="TASK_RETURNED") {
+                        if (results.result.data.description) {
+                            setTaskDescription(results.result.data.description);
+                            setInitialDescription(results.result.data.description);
                         }
-                        setTaskTitle(results.result.title);
-                        setInitialTitle(results.result.title);
+                        setTaskTitle(results.result.data.title);
+                        setInitialTitle(results.result.data.title);
 
-                        setTaskStatus(results.result.status);
-                        setInitialStatus(results.result.status);
+                        setTaskStatus(results.result.data.status);
+                        setInitialStatus(results.result.data.status);
 
-                        setTaskDueDate(results.result.duedate);
-                        setInitialDueDate(results.result.duedate);
+                        setTaskDueDate(results.result.data.duedate);
+                        setInitialDueDate(results.result.data.duedate);
 
-                        setTaskPriority(results.result.priority);
-                        setInitialPriority(results.result.priority);
+                        setTaskPriority(results.result.data.priority);
+                        setInitialPriority(results.result.data.priority);
 
-                        setTaskParentName(results.result.parentname);
-                        setInitialParentName(results.result.parentname);
-                        setTrueParentName(results.result.parentname);
+                        setTaskParentName(results.result.data.parentname);
+                        setInitialParentName(results.result.data.parentname);
+                        setTrueParentName(results.result.data.parentname);
 
-                        setTaskParentId(results.result.parentid);
-                        setInitialParentId(results.result.parentid);
+                        setTaskParentId(results.result.data.parentid);
+                        setInitialParentId(results.result.data.parentid);
+                    }else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+
+                    }else if (results.status === 404 && results.result.code==="NOT_FOUND"){
+                        nav("/error");
                     }
 
                 } catch (error) {
@@ -210,9 +217,15 @@ export default function TaskForm({mode}) {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     }, {},
                     "?projectid=" + projectid + "&title=" + taskParentName);
-                if (results.status === 200) {
-                    setSearchResult(results.result);
+                if (results.status === 200 && results.result.code==="PARENT_RETURNED") {
+                    setSearchResult(results.result.data);
                     setShowDropdown(true);
+                } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    sessionStorage.clear();
+                    nav("/login");
+                } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    sessionStorage.clear();
+                    nav("/login");
                 } else {
                     setSearchResult([]);
                 }
@@ -271,12 +284,15 @@ export default function TaskForm({mode}) {
                         },
                         body
                     );
-                    if (results.status === 401) {
+                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
                         sessionStorage.clear();
                         nav("/login");
-                    } else if (results.status === 422 && results.result.message === "Circular parent relation!") {
-                        throw new Error("Circular relation detected! Choose another parent!");
-                    } else if (results.status === 200) {
+                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status === 422 && results.result.code === "BAD_REQUEST") {
+                        throw new Error(results.result.message);
+                    } else if (results.status === 200 && results.result.code==="TASK_UPDATED") {
                         setInitialDescription(taskDescription);
                         setInitialStatus(taskStatus);
                         setInitialTitle(taskTitle);
@@ -293,7 +309,7 @@ export default function TaskForm({mode}) {
                         setReadOnlyDueDate(true);
                         setCanSubmit(false);
                         setShowDropdown(false);
-                        setMessage("Task updated!");
+                        setMessage(results.result.message);
                         setStatus("success");
                         setTimeout(() => {
                             setMessage("");
@@ -327,13 +343,24 @@ export default function TaskForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         },body);
-                    setMessage("Task created!");
-                    setStatus("success");
-                    setCanSubmit(false);
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                        nav(`/project/${projectId}`);
-                    }, 2000);
+                    if (results.status === 200 && results.result.code==="TASK_CREATED") {
+                        setMessage(results.result.message);
+                        setStatus("success");
+                        setCanSubmit(false);
+                        setTimeout(() => {
+                            setMessage("");
+                            setStatus("");
+                            nav(`/project/${projectId}`);
+                        }, 2000);
+                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
+                        nav("/error");
+                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    }
                 }catch(error){
                     setMessage("Error: "+error.message);
                     setStatus("error");
@@ -376,21 +403,30 @@ export default function TaskForm({mode}) {
                         }, {},
                         "?projectid=" + projectid
                     );
-                    setReadOnlyTitle(true);
-                    setReadOnlyDescription(true);
-                    setReadOnlyStatus(true);
-                    setReadOnlyPriority(true);
-                    setReadOnlyParentName(true);
-                    setReadOnlyDueDate(true);
-                    setCanSubmit(false);
-                    setShowDropdown(false);
-                    setMessage("task deleted!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                        nav(`/project/${projectid}`);
-                    }, 2000);
+                    if (results.status === 200 && results.result.code==="TASK_DELETED") {
+                        setReadOnlyTitle(true);
+                        setReadOnlyDescription(true);
+                        setReadOnlyStatus(true);
+                        setReadOnlyPriority(true);
+                        setReadOnlyParentName(true);
+                        setReadOnlyDueDate(true);
+                        setCanSubmit(false);
+                        setShowDropdown(false);
+                        setMessage("task deleted!");
+                        setStatus("success");
+                        setTimeout(() => {
+                            setMessage("");
+                            setStatus("");
+                            nav(`/project/${projectid}`);
+                        }, 2000);
+                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                        sessionStorage.clear();
+                        nav("/login");
+
+                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        sessionStorage.clear();
+                        nav("/login");
+                    }
 
                 } catch (error) {
                     setMessage("Error: " + error.message);
@@ -407,9 +443,6 @@ export default function TaskForm({mode}) {
         }
     }
 
-    useEffect(() => {
-        console.log(taskStatus);
-    },[taskStatus]);
 
 
     return(

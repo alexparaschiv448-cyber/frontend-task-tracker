@@ -43,13 +43,15 @@ export default function Projects() {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                if (results.result.length > 0) {
-
-                    setLimit(results.result[0].limit);
-                    setProjects(results.result);
-                    if (page > Math.ceil(results.result[0].limit / pageLimit)) {
-                        setPage(Math.ceil(results.result[0].limit / pageLimit));
+                if(results.status===200 && results.result.code==="PROJECTS_RETURNED") {
+                    setLimit(results.result.data[0].limit);
+                    setProjects(results.result.data);
+                    if (page > Math.ceil(results.result.data[0].limit / pageLimit)) {
+                        setPage(Math.ceil(results.result.data[0].limit / pageLimit));
                     }
+                } else if(results.status===401 && results.result.code==="UNAUTHORIZED"){
+                    sessionStorage.clear();
+                    nav("/login");
                 } else {
                     setLimit(0);
                     setProjects([]);

@@ -82,6 +82,9 @@ export default function RegisterForm() {
         };
     }, [email]);
 
+    useEffect(() => {
+        console.log(data);
+    },[data])
 
 
 
@@ -101,16 +104,19 @@ export default function RegisterForm() {
                             email: email,
                             passwordHash: password
                         });
-                    setLoading(false);
-                    setData(true);
-                    setMessage("User successfully registered!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");setStatus("")
-                        setDisabled(true);
-                        sessionStorage.setItem("authorization",r.result.token);
-                        nav("/");
-                    }, 2000);
+                    if(r.status===200 && r.result.code==="ACCOUNT_CREATED") {
+                        setLoading(false);
+                        setData(true);
+                        setMessage(r.result.message);
+                        setStatus("success");
+                        setTimeout(() => {
+                            setMessage("");
+                            setStatus("")
+                            setDisabled(true);
+                            sessionStorage.setItem("authorization", r.result.data.token);
+                            nav("/");
+                        }, 2000);
+                    }
                 } catch (error) {
                     setMessage("Error: "+error.message);
                     setStatus("error");
@@ -124,7 +130,7 @@ export default function RegisterForm() {
             sendPostRequest();
 
         }else{
-            setMessage("Invalid data!");
+            setMessage("Invalid account data!");
             setStatus("error");
             setTimeout(() => {
                 setMessage("");setStatus("");

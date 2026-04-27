@@ -8,11 +8,12 @@ import {statuses,priorities} from "../assets/ProjectSettings.jsx";
 import TasksSearchBar from "./TasksSearchBar.jsx";
 import Pages from "./Pages.jsx";
 import TaskList from "./TaskList.jsx";
+import {status_code} from "../assets/ProjectSettings.jsx";
 
 export default function ProjectTasks() {
 
     let nav=useNavigate();
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -46,18 +47,30 @@ export default function ProjectTasks() {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                if (results.status === 200 && results.result.code==="TASKS_RETURNED") {
+                if (results.status === 200 && results.result.code===status_code["200"][1]) {
                     setLimit(results.result.data[0].limit);
                     setTasks(results.result.data);
                     if (page > Math.ceil(results.result.data[0].limit / pageLimit)) {
                         setPage(Math.ceil(results.result.data[0].limit / pageLimit));
                     }
-                } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                } else if (results.status === 401 && results.result.code===status_code["401"]) {
                     sessionStorage.clear();
-                    nav("/login");
-                } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
+                } else if (results.status === 403 && results.result.code===status_code["403"]) {
                     sessionStorage.clear();
-                    nav("/login");
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
                 } else {
                     setLimit(0);
                     setTasks([]);
@@ -66,11 +79,7 @@ export default function ProjectTasks() {
 
                 setLoading(false);
             }catch(error){
-                setMessage("Error: "+error.message);
-                setStatus("error");
-                setTimeout(() => {
-                    setMessage("");setStatus("");
-                }, 3000);
+                set_toast(error.message,"error");
             }finally {
                 setLoading(false);
             }

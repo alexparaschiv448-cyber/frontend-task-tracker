@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import Input from './Input';
 import {context} from "./Context.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx"
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 export default function RegisterForm() {
     const nav=useNavigate();
 
@@ -13,7 +15,7 @@ export default function RegisterForm() {
     const [data, setData] = useState(null);
 
     const [error, setError] = useState(null);
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -82,9 +84,6 @@ export default function RegisterForm() {
         };
     }, [email]);
 
-    useEffect(() => {
-        console.log(data);
-    },[data])
 
 
 
@@ -104,25 +103,20 @@ export default function RegisterForm() {
                             email: email,
                             passwordHash: password
                         });
-                    if(r.status===200 && r.result.code==="ACCOUNT_CREATED") {
+                    if(r.status===200 && r.result.code===status_code["200"][0]) {
                         setLoading(false);
                         setData(true);
-                        setMessage(r.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("")
-                            setDisabled(true);
-                            sessionStorage.setItem("authorization", r.result.data.token);
-                            nav("/");
-                        }, 2000);
+                        sessionStorage.setItem("authorization", r.result.data.token);
+                        nav("/", {
+                            state: {
+                                toastMessage: r.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
                     }
                 } catch (error) {
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 }finally {
                     setLoading(false);
                 }
@@ -130,11 +124,7 @@ export default function RegisterForm() {
             sendPostRequest();
 
         }else{
-            setMessage("Invalid account data!");
-            setStatus("error");
-            setTimeout(() => {
-                setMessage("");setStatus("");
-            }, 3000);
+            set_toast("Invalid account data!","error");
         }
 
     }

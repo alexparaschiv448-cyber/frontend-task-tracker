@@ -5,6 +5,8 @@ import {useContext, useEffect, useState} from "react";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
 import {context} from "./Context.jsx";
 import {useNavigate} from "react-router-dom";
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 
 export default function ProjectsChart() {
 
@@ -20,7 +22,7 @@ export default function ProjectsChart() {
     const [doneTotal,setDoneTotal] = useState(0);
 
 
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -40,12 +42,16 @@ export default function ProjectsChart() {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
-                        nav("/error");
-                    } else if (results.status === 200 && results.result.code==="RETURNED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 200 && results.result.code===status_code["200"][1]) {
                         setStatusesNew(results.result.data.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
                         setStatusesInProgress(results.result.data.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
                         setStatusesDone(results.result.data.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
@@ -62,12 +68,7 @@ export default function ProjectsChart() {
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }
@@ -181,7 +182,7 @@ export default function ProjectsChart() {
     };
 
     return (
-        <div className="absolute top-50 w-[48%] bg-neutral-primary-soft border border-default rounded-base shadow-md p-4 md:p-6 inline-block">
+        <div className=" w-[50%] bg-neutral-primary-soft border border-default rounded-base shadow-md p-4 md:p-6 inline-block">
 
             {/* HEADER */}
             <div className="flex justify-between pb-4 mb-4 border-b border-light">
@@ -201,7 +202,7 @@ export default function ProjectsChart() {
             {/* LEGEND */}
             <Card className="mb-4 relative">
                 <input value={yAxisIncrement} type={"number"} className="absolute top-12 right-5 w-[80px] bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none text-center" min={1} max={100}
-                onChange={(e)=>{console.log("yes"); if(e.currentTarget.value>100 || e.currentTarget.value<1){setYAxisIncrement(1);}
+                onChange={(e)=>{if(e.currentTarget.value>100 || e.currentTarget.value<1){setYAxisIncrement(1);}
                 else{setYAxisIncrement(e.currentTarget.value);}}} />
                 <div className="space-y-2">
                     {data.map(series => (

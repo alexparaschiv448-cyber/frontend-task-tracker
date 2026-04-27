@@ -1,12 +1,14 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
 import ProjectsSearchBar from "../components/ProjectsSearchBar";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useContext, useEffect, useState} from "react";
 import FetchWrapper from "../assets/FetchWrapper.jsx"
 import {context} from "../components/Context.jsx";
 import Pages from "../components/Pages.jsx"
 import ProjectList from "../components/ProjectList.jsx"
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 
 export default function Projects() {
     let nav=useNavigate();
@@ -23,10 +25,20 @@ export default function Projects() {
     const [projects,setProjects] = useState([]);
 
 
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
+
+    const location = useLocation();
+    useEffect(() => {
+        const state = location.state;
+
+        if (state?.toastMessage && state?.toastStatus) {
+            set_toast(state.toastMessage, state.toastStatus);
+            window.history.replaceState({}, '');
+        }
+    }, []);
 
 
     useEffect(() => {
@@ -43,15 +55,21 @@ export default function Projects() {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     },
                     {}, query)
-                if(results.status===200 && results.result.code==="PROJECTS_RETURNED") {
+                if(results.status===200 && results.result.code===status_code["200"][1]) {
                     setLimit(results.result.data[0].limit);
                     setProjects(results.result.data);
                     if (page > Math.ceil(results.result.data[0].limit / pageLimit)) {
                         setPage(Math.ceil(results.result.data[0].limit / pageLimit));
                     }
-                } else if(results.status===401 && results.result.code==="UNAUTHORIZED"){
+                } else if(results.status===401 && results.result.code===status_code["401"]){
                     sessionStorage.clear();
-                    nav("/login");
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
                 } else {
                     setLimit(0);
                     setProjects([]);
@@ -60,11 +78,7 @@ export default function Projects() {
 
                 setLoading(false);
             }catch(error){
-                setMessage("Error: "+error.message);
-                setStatus("error");
-                setTimeout(() => {
-                    setMessage("");setStatus("");
-                }, 3000);
+                set_toast(error.message,"error");
             }finally {
                 setLoading(false);
             }

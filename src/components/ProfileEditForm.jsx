@@ -5,6 +5,10 @@ import {context} from "./Context.jsx";
 import {user_context} from "./AuthCheck.jsx";
 import ProfileInput from "./ProfileInput.jsx"
 import FetchWrapper from "../assets/FetchWrapper.jsx"
+import {status_code} from "../assets/ProjectSettings.jsx";
+
+
+
 export default function RegisterForm() {
     const {user_name,user_email,user_id,user_creation_date}=useContext(user_context);
     const [name,setName]=user_name;
@@ -21,7 +25,7 @@ export default function RegisterForm() {
     const [canSubmit,setCanSubmit]=useState(false);
     const [uniqueEmail,setUniqueEmail]=useState(true);
 
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -101,7 +105,7 @@ export default function RegisterForm() {
                             email:inputEmail,firstname:inputFirstName,lastname:inputLastName
                         }
                         );
-                    if(results.status===200 && results.result.code==="USER_UPDATED") {
+                    if(results.status===200 && results.result.code===status_code["200"][2]) {
                         sessionStorage.setItem("authorization", results.result.data.token);
                         setName(results.result.data.firstname + " " + results.result.data.lastname);
                         setEmail(results.result.data.email);
@@ -109,35 +113,34 @@ export default function RegisterForm() {
                         setReadonlyLast(true);
                         setReadonlyFirst(true);
                         setCanSubmit(false);
-                        setMessage(results.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("")
-                        }, 3000);
-                    } else if (results.status===403 && results.result.code==="FORBIDDEN") {
+                        set_toast(results.result.message,"success");
+                    } else if (results.status===403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status===401 && results.result.code==="UNAUTHORIZED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status===401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
                     }
 
                 }catch (error){
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 }finally{setLoading(false);}
             }
             sendPostRequest();
         }else{
-            setMessage("Existing email address!");
-            setStatus("error");
-            setTimeout(() => {
-                setMessage("");setStatus("");
-            }, 3000);
+            set_toast("Email already exists!","error");
         }
     }
 
@@ -152,30 +155,40 @@ export default function RegisterForm() {
                     "DELETE",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`}
                 );
-                if(results.status===200 && results.result.code==="USER_DELETED") {
+                if(results.status===200 && results.result.code===status_code["200"][3]) {
                     sessionStorage.removeItem("authorization");
                     setReadonlyEmail(true);
                     setReadonlyLast(true);
                     setReadonlyFirst(true);
-                    setMessage(results.result.message);
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");nav("/");
-                    }, 2000);
-                } else if (results.status===403 && results.result.code==="FORBIDDEN") {
+                    nav("/", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "success"
+                        },
+                        replace: true
+                    });
+                } else if (results.status===403 && results.result.code===status_code["403"]) {
                     sessionStorage.clear();
-                    nav("/login");
-                } else if (results.status===401 && results.result.code==="UNAUTHORIZED") {
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
+                } else if (results.status===401 && results.result.code===status_code["401"]) {
                     sessionStorage.clear();
-                    nav("/login");
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
                 }
 
             }catch (error){
-                setMessage("Error: "+error.message);
-                setStatus("error");
-                setTimeout(() => {
-                    setMessage("");setStatus("");
-                }, 3000);
+                set_toast(error.message,"error");
             }finally{setLoading(false);}
         }
         sendPostRequest();

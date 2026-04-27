@@ -5,6 +5,8 @@ import Input from "./Input.jsx";
 import {priorities, statuses} from "../assets/ProjectSettings.jsx";
 import Description from "./Description.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 
 
 export default function TaskForm({mode}) {
@@ -18,7 +20,7 @@ export default function TaskForm({mode}) {
     let nav=useNavigate();
     let location=useLocation();
     const {projectid}=location.state || {};
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -147,7 +149,6 @@ export default function TaskForm({mode}) {
             setLoading(true);
 
             async function fetchTaskData() {
-                console.log("ID: ",id);
                 try {
                     const results = await FetchWrapper("/tasks/" + id,
                         "GET",
@@ -155,10 +156,16 @@ export default function TaskForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 200 && results.result.code==="TASK_RETURNED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 200 && results.result.code===status_code["200"][1]) {
                         if (results.result.data.description) {
                             setTaskDescription(results.result.data.description);
                             setInitialDescription(results.result.data.description);
@@ -181,21 +188,22 @@ export default function TaskForm({mode}) {
 
                         setTaskParentId(results.result.data.parentid);
                         setInitialParentId(results.result.data.parentid);
-                    }else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    }else if (results.status === 403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
 
-                    }else if (results.status === 404 && results.result.code==="NOT_FOUND"){
+                    }else if (results.status === 404 && results.result.code===status_code["404"]){
                         nav("/error");
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }
@@ -217,15 +225,27 @@ export default function TaskForm({mode}) {
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     }, {},
                     "?projectid=" + projectid + "&title=" + taskParentName);
-                if (results.status === 200 && results.result.code==="PARENT_RETURNED") {
+                if (results.status === 200 && results.result.code===status_code["200"][1]) {
                     setSearchResult(results.result.data);
                     setShowDropdown(true);
-                } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                } else if (results.status === 401 && results.result.code===status_code["401"]) {
                     sessionStorage.clear();
-                    nav("/login");
-                } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
+                } else if (results.status === 403 && results.result.code===status_code["403"]) {
                     sessionStorage.clear();
-                    nav("/login");
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
                 } else {
                     setSearchResult([]);
                 }
@@ -284,15 +304,27 @@ export default function TaskForm({mode}) {
                         },
                         body
                     );
-                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 422 && results.result.code === "BAD_REQUEST") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 422 && results.result.code === status_code["422"]) {
                         throw new Error(results.result.message);
-                    } else if (results.status === 200 && results.result.code==="TASK_UPDATED") {
+                    } else if (results.status === 200 && results.result.code===status_code["200"][2]) {
                         setInitialDescription(taskDescription);
                         setInitialStatus(taskStatus);
                         setInitialTitle(taskTitle);
@@ -309,21 +341,11 @@ export default function TaskForm({mode}) {
                         setReadOnlyDueDate(true);
                         setCanSubmit(false);
                         setShowDropdown(false);
-                        setMessage(results.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("");
-                        }, 3000);
+                        set_toast(results.result.message,"success");
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }
@@ -343,30 +365,38 @@ export default function TaskForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         },body);
-                    if (results.status === 200 && results.result.code==="TASK_CREATED") {
-                        setMessage(results.result.message);
-                        setStatus("success");
+                    if (results.status === 200 && results.result.code===status_code["200"][0]) {
                         setCanSubmit(false);
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("");
-                            nav(`/project/${projectId}`);
-                        }, 2000);
-                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
+                        nav(`/project/${projectId}`, {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 404 && results.result.code===status_code["404"]) {
                         nav("/error");
-                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    } else if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
                     }
                 }catch(error){
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 }finally {
                     setLoading(false);
                 }
@@ -403,7 +433,7 @@ export default function TaskForm({mode}) {
                         }, {},
                         "?projectid=" + projectid
                     );
-                    if (results.status === 200 && results.result.code==="TASK_DELETED") {
+                    if (results.status === 200 && results.result.code===status_code["200"][3]) {
                         setReadOnlyTitle(true);
                         setReadOnlyDescription(true);
                         setReadOnlyStatus(true);
@@ -412,29 +442,37 @@ export default function TaskForm({mode}) {
                         setReadOnlyDueDate(true);
                         setCanSubmit(false);
                         setShowDropdown(false);
-                        setMessage("task deleted!");
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("");
-                            nav(`/project/${projectid}`);
-                        }, 2000);
-                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
-                        sessionStorage.clear();
-                        nav("/login");
+                        nav(`/project/${projectid}`, {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
 
-                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                    } else if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+
+                    } else if (results.status === 403 && results.result.code===status_code["403"]) {
+                        sessionStorage.clear();
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }

@@ -4,6 +4,7 @@ import {useContext, useEffect, useState} from "react";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
 import {context} from "./Context.jsx";
 import {useNavigate} from "react-router-dom";
+import {status_code} from "../assets/ProjectSettings.jsx";
 
 export default function ProjectsChart() {
 
@@ -20,10 +21,11 @@ export default function ProjectsChart() {
     const neutralPrimaryColor = "#ffffff";
 
 
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
+    const [loading2, setLoading2] = useState(true);
 
     const [highest,setHighest]=useState(0);
     const [high,setHigh]=useState(0);
@@ -36,6 +38,7 @@ export default function ProjectsChart() {
     useEffect(() => {
         if(sessionStorage.getItem('authorization')) {
             setLoading(true);
+            setLoading2(true);
             async function fetchTicketData() {
                 try {
                     const results = await FetchWrapper("/dashboard/priorities",
@@ -44,14 +47,17 @@ export default function ProjectsChart() {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 404 && results.result.code==="NOT_FOUND") {
-                        nav("/error");
-                    } else if (results.status === 200 && results.result.code==="RETURNED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 200 && results.result.code===status_code["200"][1]) {
                         const total=results.result.data[0].highest+results.result.data[0].high+results.result.data[0].medium+results.result.data[0].low+results.result.data[0].lowest;
-                        console.log("total: ",total);
                         if(total>0){
                             setHighest((results.result.data[0].highest*100)/total);
                             setHigh((results.result.data[0].high*100)/total);
@@ -61,18 +67,17 @@ export default function ProjectsChart() {
                         }
                     }
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
+                    setLoading2(false);
                 }
             }
 
             fetchTicketData();
+        }else{
+            setLoading2(false);
+            setLoading(false);
         }
     },[])
 
@@ -134,11 +139,13 @@ export default function ProjectsChart() {
             },
         }
 
-
+    if(loading2){
+        return null;
+    }
     return(
         <>
             <div
-                className="absolute top-50 right-6 w-[48%] bg-neutral-primary-soft border border-default rounded-base shadow-md p-4 md:p-6 inline-block">
+                className=" w-[50%] bg-neutral-primary-soft border border-default rounded-base shadow-md p-4 md:p-6 inline-block">
 
                 <div className="flex justify-between items-start w-full">
                     <div className="flex-col items-center">
@@ -208,7 +215,7 @@ export default function ProjectsChart() {
                     </div>
                 </div>
 
-                {loading ? <div>Loading...</div> : <div className="py-6" id="pie-chart"><Chart type={"pie"} options={options} series={[
+                {loading2 ? <div>Loading...</div> : <div className="py-6" id="pie-chart"><Chart type={"pie"} options={options} series={[
                     highest,
                     high,
                     medium,

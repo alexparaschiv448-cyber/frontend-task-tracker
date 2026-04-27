@@ -92,10 +92,32 @@ export default function ProjectEditForm() {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                     });
-                if(results.status===401){
-
-                    sessionStorage.clear();
-                    nav("/login");
+                if(results.status===401) {
+                    sessionStorage.setItem("toastMessage", results.result.message);
+                    sessionStorage.setItem("toastStatus", "error");
+                    sessionStorage.removeItem("authorization");
+                    setTimeout(() => {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    }, 3000);
+                }else if(results.status===403){
+                    sessionStorage.setItem("toastMessage",results.result.message);
+                    sessionStorage.setItem("toastStatus","error");
+                    sessionStorage.removeItem("authorization");
+                    setTimeout(() => {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    }, 3000);
                 }else if(results.status===404){
                     nav("/error");
                 }else if(results.status===200){

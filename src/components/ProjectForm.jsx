@@ -7,11 +7,13 @@ import {useNavigate} from "react-router-dom";
 import Input from "./Input.jsx";
 import {statuses} from "../assets/ProjectSettings.jsx";
 import Description from "./Description.jsx";
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 
 export default function ProjectForm({mode}) {
 
     let nav=useNavigate();
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -91,12 +93,18 @@ export default function ProjectForm({mode}) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         });
-                    if (results.status === 401 && results.result.code === "UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code === status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 404 && results.result.code === "NOT_FOUND") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 404 && results.result.code === status_code["404"]) {
                         nav("/error");
-                    } else if (results.status === 200 && results.result.code === "PROJECT_FOUND") {
+                    } else if (results.status === 200 && results.result.code === status_code["200"][1]) {
                         setProjectDescription(results.result.data.description);
                         setInitialDescription(results.result.data.description);
                         setProjectName(results.result.data.name);
@@ -104,18 +112,19 @@ export default function ProjectForm({mode}) {
                         setProjectStatus(results.result.data.status);
                         setInitialStatus(results.result.data.status);
                         setProjectCreationDate(results.result.data.createdat);
-                    } else if(results.status===403 && results.result.code==="FORBIDDEN"){
+                    } else if(results.status===403 && results.result.code===status_code["403"]){
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }
@@ -147,13 +156,25 @@ export default function ProjectForm({mode}) {
                         },
                         body
                     );
-                    if (results.status === 401 && results.result.code === "UNAUTHORIZED") {
+                    if (results.status === 401 && results.result.code === status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 200 && results.result.code==="PROJECT_UPDATED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 200 && results.result.code===status_code["200"][2]) {
                         setInitialDescription(projectDescription);
                         setInitialStatus(projectStatus);
                         setInitialName(projectName);
@@ -161,21 +182,11 @@ export default function ProjectForm({mode}) {
                         setReadOnlyDescription(true);
                         setReadOnlyStatus(true);
                         setCanSubmit(false);
-                        setMessage(results.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("");
-                        }, 3000);
+                        set_toast(results.result.message,"success");
                     }
 
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }
@@ -202,39 +213,33 @@ export default function ProjectForm({mode}) {
                                 "Content-Type": "application/json",
                                 "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                             },body)
-                        if(results.status===200 && results.result.code==="PROJECT_CREATED") {
-                            setMessage(results.result.message);
-                            setStatus("success");
-                            setTimeout(() => {
-                                setMessage("");
-                                setStatus("")
-                                nav("/projects");
-                            }, 2000);
-                        } else if(results.status===401 && results.result.code==="UNAUTHORIZED") {
-                            setMessage(results.result.message);
-                            setStatus("error");
-                            setTimeout(() => {
-                                setMessage("");
-                                setStatus("")
-                            }, 3000);
+                        if(results.status===200 && results.result.code===status_code["200"][0]) {
+                            nav("/projects", {
+                                state: {
+                                    toastMessage: results.result.message,
+                                    toastStatus: "success"
+                                },
+                                replace: true
+                            });
+                        } else if(results.status===401 && results.result.code===status_code["401"]) {
+                            sessionStorage.clear();
+                            nav("/login", {
+                                state: {
+                                    toastMessage: results.result.message,
+                                    toastStatus: "error"
+                                },
+                                replace: true
+                            });
                         }
                     }catch(error){
-                        setMessage("Error: "+error.message);
-                        setStatus("error");
-                        setTimeout(() => {
-                            setMessage("");setStatus("");
-                        }, 3000);
+                        set_toast(error.message,"error");
                     }finally {
                         setLoading(false);
                     }
                 }
                 createProject();
             }else{
-                setMessage("Invalid data!");
-                setStatus("error");
-                setTimeout(() => {
-                    setMessage("");setStatus("");
-                }, 3000);
+                set_toast("Invalid data","success");
             }
         }
     }
@@ -253,32 +258,39 @@ export default function ProjectForm({mode}) {
                             "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
                         }
                     );
-                    if (results.status === 200 && results.result.code==="PROJECT_DELETED") {
+                    if (results.status === 200 && results.result.code===status_code["200"][3]) {
                         setReadOnlyStatus(true);
                         setReadOnlyName(true);
                         setReadOnlyDescription(true);
                         setCanSubmit(false);
-                        setMessage(results.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");
-                            setStatus("");
-                            nav("/projects");
-                        }, 2000);
-                    } else if (results.status === 403 && results.result.code==="FORBIDDEN") {
+                        nav("/projects", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 403 && results.result.code===status_code["403"]) {
                         sessionStorage.clear();
-                        nav("/login");
-                    } else if (results.status === 401 && results.result.code==="UNAUTHORIZED") {
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status === 401 && results.result.code===status_code["401"]) {
                         sessionStorage.clear();
-                        nav("/login");
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
                     }
                 } catch (error) {
-                    setMessage("Error: " + error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");
-                        setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 } finally {
                     setLoading(false);
                 }

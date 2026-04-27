@@ -1,20 +1,35 @@
 import '../index.css'
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Input from "./Input.jsx";
 import {useNavigate} from "react-router-dom";
 import {context} from "./Context.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx";
+import {useLocation} from "react-router-dom";
+import {status_code} from "../assets/ProjectSettings.jsx";
 
 export default function LoginForm() {
     const nav=useNavigate();
+    const location = useLocation();
 
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
     const [disabled,setDisabled]=useState(false);
+
+    useEffect(() => {
+        const state = location.state;
+
+        if (state?.toastMessage && state?.toastStatus) {
+            set_toast(state.toastMessage, state.toastStatus);
+            window.history.replaceState({}, '');
+        }
+    }, []);
+
+
+
     function validateEmail(email){
         if(email.length>30){
             return "Email too long!";
@@ -53,39 +68,28 @@ export default function LoginForm() {
 
                     setLoading(false);
 
-                    if(r.status===404 && r.result.code==="NOT_FOUND"){
-                        setMessage(r.result.message);
-                        setStatus("error");
-                        setTimeout(() => {
-                            setMessage("");setStatus("");
-                        }, 3000);
-                    }else if(r.status===200 && r.result.code==="AUTHORIZED"){
-                        setMessage(r.result.message);
-                        setStatus("success");
-                        setTimeout(() => {
-                            setMessage("");setStatus("");
-                            sessionStorage.setItem("authorization",r.result.data.token);
-                            nav("/");
-                        }, 2000);
+                    if(r.status===404 && r.result.code===status_code["404"]){
+                        set_toast(r.result.message, "error");
+                    }else if(r.status===200 && r.result.code===status_code["200"][4]){
+                        sessionStorage.setItem("authorization",r.result.data.token);
+                        nav("/", {
+                            state: {
+                                toastMessage: r.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
                     }
 
                 } catch (error) {
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast("error: "+error.message, "error");
                 }finally {
                     setLoading(false);
                 }
             };
             sendPostRequest();
         }else{
-            setMessage("Invalid user credentials!");
-            setStatus("error");
-            setTimeout(() => {
-                setMessage("");setStatus("");
-            }, 3000);
+            set_toast("Invalid user credentials", "error");
         }
         setDisabled(false);
     }

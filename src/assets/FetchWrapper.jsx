@@ -11,6 +11,10 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
                return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
@@ -25,6 +29,10 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
@@ -40,6 +48,10 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
@@ -53,6 +65,10 @@ export default function Fetch(endpoint,method="GET",headers={"Content-Type": "ap
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();

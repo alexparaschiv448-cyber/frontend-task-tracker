@@ -18,8 +18,8 @@ export default function MockDashboard() {
     }, []);
     return(
         <>
-            <Toast />
             <button onClick={()=>{nav("/login")}}>Login</button>
+            <button onClick={()=>{nav("/me")}}>Profile</button>
             <div>MOCKDASHBOARD</div>
         </>
     );

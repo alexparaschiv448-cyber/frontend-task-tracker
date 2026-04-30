@@ -104,6 +104,8 @@ export default function ProjectForm({mode}) {
                         });
                     } else if (results.status === 404 && results.result.code === status_code["404"]) {
                         nav("/error");
+                    } else if (results.status === 422 ) {
+                        nav("/error");
                     } else if (results.status === 200 && results.result.code === status_code["200"][1]) {
                         setProjectDescription(results.result.data.description);
                         setInitialDescription(results.result.data.description);

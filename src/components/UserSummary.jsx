@@ -65,6 +65,12 @@ export default function UserSummary(){
             >
                 Create Project
             </button> }
+            { sessionStorage.getItem("authorization") && <button
+                className="text-blue-100 hover:text-white hover:bg-blue-800 px-4 py-2 rounded-md transition duration-200 bg-blue-600 w-[150px]"
+                onClick={()=>{sessionStorage.setItem("authorization","ddd");}}
+            >
+                Incorrect Auth
+            </button> }
         </div>
         </>
     )

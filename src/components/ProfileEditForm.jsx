@@ -10,11 +10,12 @@ import {status_code} from "../assets/ProjectSettings.jsx";
 
 
 export default function RegisterForm() {
-    const {user_name,user_email,user_id,user_creation_date}=useContext(user_context);
+    const {user_name,user_email,user_id,user_creation_date,user_loading}=useContext(user_context);
     const [name,setName]=user_name;
     const[email, setEmail] = user_email;
     const [id, setId]=user_id;
     const [created_at,setCreated_at]=user_creation_date;
+    const [loadingUser2,setLoadingUser2]=user_loading;
 
     const [inputFirstName,setInputFirstName]=useState(name.split(" ")[0]);
     const [inputLastName,setInputLastName]=useState(name.split(" ")[1]);
@@ -193,6 +194,8 @@ export default function RegisterForm() {
         }
         sendPostRequest();
     }
+
+
     return(
         <>
             <form onSubmit={(e) => e.preventDefault()}>

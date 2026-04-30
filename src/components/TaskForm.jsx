@@ -200,6 +200,8 @@ export default function TaskForm({mode}) {
 
                     }else if (results.status === 404 && results.result.code===status_code["404"]){
                         nav("/error");
+                    }else if (results.status === 422){
+                        nav("/error");
                     }
 
                 } catch (error) {

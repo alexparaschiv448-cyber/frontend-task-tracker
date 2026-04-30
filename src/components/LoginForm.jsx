@@ -19,6 +19,7 @@ export default function LoginForm() {
     const [status,setStatus]=message_status;
     const [disabled,setDisabled]=useState(false);
 
+
     useEffect(() => {
         const state = location.state;
 
@@ -26,7 +27,7 @@ export default function LoginForm() {
             set_toast(state.toastMessage, state.toastStatus);
             window.history.replaceState({}, '');
         }
-    }, []);
+    }, [location.state]);
 
 
 

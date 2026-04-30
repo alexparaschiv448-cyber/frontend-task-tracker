@@ -139,9 +139,6 @@ export default function ProjectsChart() {
             },
         }
 
-    if(loading2){
-        return null;
-    }
     return(
         <>
             <div

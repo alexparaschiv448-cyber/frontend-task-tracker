@@ -3,7 +3,7 @@ import {useContext, useEffect} from "react";
 import {context} from "../../components/Context.jsx";
 import PageLayout from "../../components/PageLayout.jsx";
 
-export default function MockDashboard() {
+export default function MockProjectsList() {
     let nav=useNavigate();
     const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const location = useLocation();
@@ -19,7 +19,7 @@ export default function MockDashboard() {
     return(
         <>
             <PageLayout>
-            <div>MOCKDASHBOARD</div>
+                <button onClick={()=>{nav("/project/152")}}>Go</button>
             </PageLayout>
         </>
     );

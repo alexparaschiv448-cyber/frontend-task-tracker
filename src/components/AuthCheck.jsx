@@ -81,7 +81,7 @@ export default function AuthCheck({children}){
 
                 }
                 else {
-                    return <Navigate to={"/login"} replace={true}
+                    return <Navigate to={"/login"}
                                      state={{toastMessage: "Unauthorized access!", toastStatus: "error"}}></Navigate>;
                 }
                 } else if (location.pathname !== "/" && location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/error" && (!authorized) && !loading) {

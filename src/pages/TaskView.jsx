@@ -1,6 +1,6 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
-import RegisterForm from "../components/RegisterForm";
+import TaskForm from "../components/TaskForm";
 import {useContext, useEffect} from "react";
 import {context} from "../components/Context.jsx";
 import {useLocation} from "react-router-dom";
@@ -18,8 +18,8 @@ export default function Register() {
     }, []);
     return(
         <>
-            <PageLayout>
-            <RegisterForm />
+            <PageLayout minHeight={"min-h-[1500px]"}>
+            <TaskForm mode={"edit"} />
             </PageLayout>
         </>
     )

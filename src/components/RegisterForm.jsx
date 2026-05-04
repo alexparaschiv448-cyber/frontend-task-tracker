@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import Input from './Input';
 import {context} from "./Context.jsx";
 import FetchWrapper from "../assets/FetchWrapper.jsx"
+import {status_code} from "../assets/ProjectSettings.jsx";
+
 export default function RegisterForm() {
     const nav=useNavigate();
 
@@ -13,7 +15,7 @@ export default function RegisterForm() {
     const [data, setData] = useState(null);
 
     const [error, setError] = useState(null);
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -36,6 +38,9 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
     function validateEmail(email){
         if(email.length>30){
             return "Email too long!";
@@ -57,9 +62,15 @@ export default function RegisterForm() {
         }
         return false;
     }
+
+
+
+
+
+
     useEffect(() => {
         async function checkEmail() {
-            const r= await FetchWrapper("http://localhost:8000/checkemail/"+email);
+            const r= await FetchWrapper("/checkemail/"+email);
             setData(r.result.unique);
 
         }
@@ -72,12 +83,17 @@ export default function RegisterForm() {
             controller.abort();
         };
     }, [email]);
+
+
+
+
+
     function handleClick(){
         if(!validateName(firstName) && !validateEmail(email) && !validatePassword(password) && !validateName(lastName) && email!=='' && password!=='' && lastName!=='' && firstName!=='' && data){
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const r=await FetchWrapper("http://localhost:8000/auth/register",
+                    const r=await FetchWrapper("/auth/register",
                         "POST",
                         {
                             "Content-Type": "application/json",
@@ -87,22 +103,20 @@ export default function RegisterForm() {
                             email: email,
                             passwordHash: password
                         });
-                    setLoading(false);
-                    setData(true);
-                    setMessage("User successfully registered!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");setStatus("")
-                        setDisabled(true);
-                        sessionStorage.setItem("authorization",r.result.token);
-                        nav("/");
-                    }, 2000);
+                    if(r.status===200 && r.result.code===status_code["200"][0]) {
+                        setLoading(false);
+                        setData(true);
+                        sessionStorage.setItem("authorization", r.result.data.token);
+                        nav("/", {
+                            state: {
+                                toastMessage: r.result.message,
+                                toastStatus: "success"
+                            },
+                            replace: true
+                        });
+                    }
                 } catch (error) {
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 }finally {
                     setLoading(false);
                 }
@@ -110,11 +124,7 @@ export default function RegisterForm() {
             sendPostRequest();
 
         }else{
-            setMessage("Invalid data!");
-            setStatus("error");
-            setTimeout(() => {
-                setMessage("");setStatus("");
-            }, 3000);
+            set_toast("Invalid account data!","error");
         }
 
     }

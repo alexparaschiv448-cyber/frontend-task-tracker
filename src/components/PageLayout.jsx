@@ -1,21 +1,25 @@
 import NavBar from "./NavBar.jsx";
-import {useState, createContext, useContext} from "react";
+import {useContext} from "react";
 import Loading from "./Loading.jsx";
 import {context} from "./Context.jsx";
-export default function PageLayout({children}) {
-    const {loading_status}= useContext(context);
-    const [loading,setLoading]=loading_status;
-
+import Toast from "./Toast.jsx";
+export default function PageLayout({minHeight="min-h-screen",children}) {
+    const {toast_message,message_status,loading_status}=useContext(context);
+    const [loading, setLoading] = loading_status;
+    const [message,setMessage]=toast_message;
+    const [status,setStatus]=message_status;
+    const height=minHeight.split("-")[1]+"-"+minHeight.split("-")[2];
     return(
         <>
             <NavBar/>
             <Loading visible={loading} />
-            <div className="min-h-screen flex justify-center items-center">
 
-                <div className="w-[90%] h-screen bg-white p-6">
+            <div className={minHeight+" flex justify-center items-start"}>
+
+                <div className={height+" "+minHeight+" w-[90%] bg-white p-6 relative"}>
                     {children}
                 </div>
-
+                <Toast type={status} message={message}  show={!!status} />
             </div>
         </>
     )

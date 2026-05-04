@@ -5,12 +5,17 @@ import {context} from "./Context.jsx";
 import {user_context} from "./AuthCheck.jsx";
 import ProfileInput from "./ProfileInput.jsx"
 import FetchWrapper from "../assets/FetchWrapper.jsx"
+import {status_code} from "../assets/ProjectSettings.jsx";
+
+
+
 export default function RegisterForm() {
-    const {user_name,user_email,user_id,user_creation_date}=useContext(user_context);
+    const {user_name,user_email,user_id,user_creation_date,user_loading}=useContext(user_context);
     const [name,setName]=user_name;
     const[email, setEmail] = user_email;
     const [id, setId]=user_id;
     const [created_at,setCreated_at]=user_creation_date;
+    const [loadingUser2,setLoadingUser2]=user_loading;
 
     const [inputFirstName,setInputFirstName]=useState(name.split(" ")[0]);
     const [inputLastName,setInputLastName]=useState(name.split(" ")[1]);
@@ -21,7 +26,7 @@ export default function RegisterForm() {
     const [canSubmit,setCanSubmit]=useState(false);
     const [uniqueEmail,setUniqueEmail]=useState(true);
 
-    const {toast_message,message_status,loading_status}=useContext(context);
+    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
     const [loading, setLoading] = loading_status;
     const [message,setMessage]=toast_message;
     const [status,setStatus]=message_status;
@@ -29,7 +34,7 @@ export default function RegisterForm() {
     useEffect(() => {
         if(inputEmail!==email) {
             async function checkEmail() {
-                const r = await FetchWrapper("http://localhost:8000/checkemail/" + inputEmail);
+                const r = await FetchWrapper("/checkemail/" + inputEmail);
                 setUniqueEmail(r.result.unique);
             }
             const timer = setTimeout(() => {
@@ -45,12 +50,18 @@ export default function RegisterForm() {
         }
 
     }, [inputEmail]);
+
+
+
     useEffect(()=>{
         if((inputFirstName!==name.split(" ")[0] || inputLastName!==name.split(" ")[1] || inputEmail!==email) && inputEmail && inputLastName && inputFirstName && !validateEmail(inputEmail) && !validateName(inputFirstName) && !validateName(inputLastName)){
             setCanSubmit(true);
         }
         else{setCanSubmit(false);}
     },[inputEmail,inputFirstName,inputLastName])
+
+
+
     function validateName(name){
         if(name.length>30){
             return "Name too long!";
@@ -88,41 +99,49 @@ export default function RegisterForm() {
             setLoading(true);
             const sendPostRequest = async () => {
                 try {
-                    const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                    const results = await FetchWrapper("/users/"+id,
                         "PUT",
                         {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`},
                         {
                             email:inputEmail,firstname:inputFirstName,lastname:inputLastName
                         }
                         );
-                    sessionStorage.setItem("authorization", results.result.token);
-                    setName(results.result.firstname+" "+results.result.lastname);
-                    setEmail(results.result.email);
-                    setReadonlyEmail(true);
-                    setReadonlyLast(true);
-                    setReadonlyFirst(true);
-                    setCanSubmit(false);
-                    setMessage("Profile updated!");
-                    setStatus("success");
-                    setTimeout(() => {
-                        setMessage("");setStatus("")
-                    }, 3000);
+                    if(results.status===200 && results.result.code===status_code["200"][2]) {
+                        sessionStorage.setItem("authorization", results.result.data.token);
+                        setName(results.result.data.firstname + " " + results.result.data.lastname);
+                        setEmail(results.result.data.email);
+                        setReadonlyEmail(true);
+                        setReadonlyLast(true);
+                        setReadonlyFirst(true);
+                        setCanSubmit(false);
+                        set_toast(results.result.message,"success");
+                    } else if (results.status===403 && results.result.code===status_code["403"]) {
+                        sessionStorage.clear();
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    } else if (results.status===401 && results.result.code===status_code["401"]) {
+                        sessionStorage.clear();
+                        nav("/login", {
+                            state: {
+                                toastMessage: results.result.message,
+                                toastStatus: "error"
+                            },
+                            replace: true
+                        });
+                    }
 
                 }catch (error){
-                    setMessage("Error: "+error.message);
-                    setStatus("error");
-                    setTimeout(() => {
-                        setMessage("");setStatus("");
-                    }, 3000);
+                    set_toast(error.message,"error");
                 }finally{setLoading(false);}
             }
             sendPostRequest();
         }else{
-            setMessage("Invalid data!");
-            setStatus("error");
-            setTimeout(() => {
-                setMessage("");setStatus("");
-            }, 3000);
+            set_toast("Email already exists!","error");
         }
     }
 
@@ -133,30 +152,50 @@ export default function RegisterForm() {
         setLoading(true);
         const sendPostRequest = async () => {
             try {
-                const results = await FetchWrapper("http://localhost:8000/users/"+id,
+                const results = await FetchWrapper("/users/"+id,
                     "DELETE",
                     {"Content-Type": "application/json","Authorization": `Bearer ${sessionStorage.getItem("authorization")}`}
                 );
-                sessionStorage.removeItem("authorization");
-                setReadonlyEmail(true);
-                setReadonlyLast(true);
-                setReadonlyFirst(true);
-                setMessage("User deleted!");
-                setStatus("success");
-                setTimeout(() => {
-                    setMessage("");setStatus("");nav("/");
-                }, 2000);
+                if(results.status===200 && results.result.code===status_code["200"][3]) {
+                    sessionStorage.removeItem("authorization");
+                    setReadonlyEmail(true);
+                    setReadonlyLast(true);
+                    setReadonlyFirst(true);
+                    nav("/", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "success"
+                        },
+                        replace: true
+                    });
+                } else if (results.status===403 && results.result.code===status_code["403"]) {
+                    sessionStorage.clear();
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
+                } else if (results.status===401 && results.result.code===status_code["401"]) {
+                    sessionStorage.clear();
+                    nav("/login", {
+                        state: {
+                            toastMessage: results.result.message,
+                            toastStatus: "error"
+                        },
+                        replace: true
+                    });
+                }
 
             }catch (error){
-                setMessage("Error: "+error.message);
-                setStatus("error");
-                setTimeout(() => {
-                    setMessage("");setStatus("");
-                }, 3000);
+                set_toast(error.message,"error");
             }finally{setLoading(false);}
         }
         sendPostRequest();
     }
+
+
     return(
         <>
             <form onSubmit={(e) => e.preventDefault()}>
@@ -218,7 +257,7 @@ export default function RegisterForm() {
                 <br/>
                 <br/>
                 <button onClick={()=>{
-                    const result = window.confirm("Are you sure you want to delete your account?");
+                    const result = window.confirm("Are you sure you want to delete your account? All projects will be deleted!");
                     if (result) {handleClickDelete();}
                 }} className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 m-4">DELETE ACCOUNT</button>
             </form>

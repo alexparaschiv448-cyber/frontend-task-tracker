@@ -1,9 +1,11 @@
+
+
 export default function NavButton({text,clickHandler}) {
     if(sessionStorage.getItem("authorization") && (text==="Register" || text==="Login")){
         return(<></>);
 
     }
-    if(!sessionStorage.getItem("authorization") && (text==="Logout" ||  text==="Profile")){
+    if(!sessionStorage.getItem("authorization") && (text==="Logout" ||  text==="Profile" || text==="Projects")){
         return(<></>);
     }
     return(

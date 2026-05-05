@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 import {status_code} from "../assets/ProjectSettings.jsx";
 
 
-export default function ProjectsChart() {
+export default function ProjectsChart({data2}) {
 
     let nav=useNavigate();
     const newColor="#7e7e7e";
@@ -20,63 +20,24 @@ export default function ProjectsChart() {
     const [newTotal,setNewTotal] = useState(0);
     const [inProgressTotal,setInProgressTotal] = useState(0);
     const [doneTotal,setDoneTotal] = useState(0);
-
-
-    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
-    const [loading, setLoading] = loading_status;
-    const [message,setMessage]=toast_message;
-    const [status,setStatus]=message_status;
-
     //const yAxisIncrement=10;
     const [yAxisIncrement,setYAxisIncrement] = useState(20);
 
-
-    useEffect(() => {
-        if(sessionStorage.getItem('authorization')) {
-            setLoading(true);
-            async function fetchProjectData() {
-                try {
-                    const results = await FetchWrapper("/dashboard/statuses",
-                        "GET",
-                        {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                        });
-                    if (results.status === 401 && results.result.code===status_code["401"]) {
-                        sessionStorage.clear();
-                        nav("/login", {
-                            state: {
-                                toastMessage: results.result.message,
-                                toastStatus: "error"
-                            },
-                            replace: true
-                        });
-                    } else if (results.status === 200 && results.result.code===status_code["200"][1]) {
-                        setStatusesNew(results.result.data.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
-                        setStatusesInProgress(results.result.data.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
-                        setStatusesDone(results.result.data.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
-                        let sum=0;
-                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].new}
-                        setNewTotal(sum);
-                        sum=0;
-                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].in_progress}
-                        setInProgressTotal(sum);
-                        sum=0;
-                        for(let i=0;i<results.result.data.length;i++){sum+=results.result.data[i].done}
-                        setDoneTotal(sum);
-
-                    }
-
-                } catch (error) {
-                    set_toast(error.message,"error");
-                } finally {
-                    setLoading(false);
-                }
-            }
-
-            fetchProjectData();
-        }
-    },[])
+    console.log("Data2 ",data2);
+    if(data2 && statusesNew.length===0 && statusesInProgress.length===0 && statusesDone.length===0){
+        setStatusesNew(data2.map((item)=>{ const s={x:item.name,y:item.new};return s;}));
+        setStatusesInProgress(data2.map((item)=>{ const s={x:item.name,y:item.in_progress};return s;}));
+        setStatusesDone(data2.map((item)=>{ const s={x:item.name,y:item.done};return s;}));
+        let sum=0;
+        for(let i=0;i<data2.length;i++){sum+=data2[i].new}
+        setNewTotal(sum);
+        sum=0;
+        for(let i=0;i<data2.length;i++){sum+=data2[i].in_progress}
+        setInProgressTotal(sum);
+        sum=0;
+        for(let i=0;i<data2.length;i++){sum+=data2[i].done}
+        setDoneTotal(sum);
+    }
 
 
 

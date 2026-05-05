@@ -5,8 +5,10 @@ import {useContext,useEffect} from "react";
 import Toast from "./Toast";
 import {user_context} from "./AuthCheck.jsx";
 import {useLocation} from "react-router-dom";
+import { useQueryClient} from '@tanstack/react-query';
 
 export default function NavBar(){
+    const queryClient = useQueryClient();
     const {user_name,user_email,user_loading}=useContext(user_context);
     const [name,setName]=user_name;
     const[email, setEmail] = user_email;
@@ -28,6 +30,7 @@ export default function NavBar(){
                     <NavButton clickHandler={()=>{if(location.pathname!=="/login"){nav("/login");}}} text="Login"/>
                     <NavButton clickHandler={()=>{
                         setLoading(true);
+                        queryClient.clear();
                         sessionStorage.clear();
                         nav("/login", {
                             state: {

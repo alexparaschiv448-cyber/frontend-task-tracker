@@ -6,7 +6,7 @@ import {context} from "./Context.jsx";
 import {useNavigate} from "react-router-dom";
 import {status_code} from "../assets/ProjectSettings.jsx";
 
-export default function ProjectsChart() {
+export default function ProjectsChart({data3}) {
 
 
 
@@ -19,67 +19,25 @@ export default function ProjectsChart() {
 
 
     const neutralPrimaryColor = "#ffffff";
+    console.log("Data3 ",data3);
 
-
-    const {toast_message,message_status,loading_status,show_toast,set_toast}=useContext(context);
-    const [loading, setLoading] = loading_status;
-    const [message,setMessage]=toast_message;
-    const [status,setStatus]=message_status;
-    const [loading2, setLoading2] = useState(true);
 
     const [highest,setHighest]=useState(0);
     const [high,setHigh]=useState(0);
     const [medium,setMedium]=useState(0);
     const [low,setLow]=useState(0);
     const [lowest,setLowest]=useState(0);
+    const [counted,setCounted]=useState(false);
 
-
-
-    useEffect(() => {
-        if(sessionStorage.getItem('authorization')) {
-            setLoading(true);
-            setLoading2(true);
-            async function fetchTicketData() {
-                try {
-                    const results = await FetchWrapper("/dashboard/priorities",
-                        "GET",
-                        {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${sessionStorage.getItem("authorization")}`
-                        });
-                    if (results.status === 401 && results.result.code===status_code["401"]) {
-                        sessionStorage.clear();
-                        nav("/login", {
-                            state: {
-                                toastMessage: results.result.message,
-                                toastStatus: "error"
-                            },
-                            replace: true
-                        });
-                    } else if (results.status === 200 && results.result.code===status_code["200"][1]) {
-                        const total=results.result.data[0].highest+results.result.data[0].high+results.result.data[0].medium+results.result.data[0].low+results.result.data[0].lowest;
-                        if(total>0){
-                            setHighest((results.result.data[0].highest*100)/total);
-                            setHigh((results.result.data[0].high*100)/total);
-                            setMedium((results.result.data[0].medium*100)/total);
-                            setLow((results.result.data[0].low*100)/total);
-                            setLowest((results.result.data[0].lowest*100)/total);
-                        }
-                    }
-                } catch (error) {
-                    set_toast(error.message,"error");
-                } finally {
-                    setLoading(false);
-                    setLoading2(false);
-                }
-            }
-
-            fetchTicketData();
-        }else{
-            setLoading2(false);
-            setLoading(false);
-        }
-    },[])
+    if(data3 && !highest && !high && !medium && !low && !lowest && !counted){
+        const total=data3[0].highest+data3[0].high+data3[0].medium+data3[0].low+data3[0].lowest;
+        setHighest((data3[0].highest*100)/total);
+        setHigh((data3[0].high*100)/total);
+        setMedium((data3[0].medium*100)/total);
+        setLow((data3[0].low*100)/total);
+        setLowest((data3[0].lowest*100)/total);
+        setCounted(true);
+    }
 
 
 
@@ -212,7 +170,17 @@ export default function ProjectsChart() {
                     </div>
                 </div>
 
-                {loading2 ? <div>Loading...</div> : <div className="py-6" id="pie-chart"><Chart type={"pie"} options={options} series={[
+                {!sessionStorage.getItem("authorization") && <div className="py-6" id="pie-chart"><Chart type={"pie"} options={options} series={[
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]} height={638}></Chart></div>}
+
+                {!data3 ? '':
+
+                    <div className="py-6" id="pie-chart"><Chart type={"pie"} options={options} series={[
                     highest,
                     high,
                     medium,

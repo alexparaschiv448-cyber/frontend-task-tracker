@@ -12,11 +12,20 @@ import ProjectCreate from "./pages/ProjectCreate.jsx";
 import ProjectView from "./pages/ProjectView.jsx";
 import TaskCreate from "./pages/TaskCreate.jsx";
 import TaskView from "./pages/TaskView.jsx";
+import {
+    QueryClient,
+    QueryClientProvider,
+    useQuery,
+} from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
+
 
 export default function App() {
     return (
         <>
-
+            <QueryClientProvider client={queryClient}>
         <Context>
             <BrowserRouter>
 
@@ -38,6 +47,7 @@ export default function App() {
 
             </BrowserRouter>
         </Context>
+            </QueryClientProvider>
         </>
     )
 }

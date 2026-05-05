@@ -1,9 +1,9 @@
-
-export default function Fetch(url,method="GET",headers={"Content-Type": "application/json"},Body){
+import {project_url} from "./ProjectSettings.jsx";
+export default function Fetch(endpoint,method="GET",headers={"Content-Type": "application/json"},Body,Query=''){
     if(method==="POST"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                     body: JSON.stringify(Body),
@@ -11,6 +11,10 @@ export default function Fetch(url,method="GET",headers={"Content-Type": "applica
                return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
@@ -18,13 +22,17 @@ export default function Fetch(url,method="GET",headers={"Content-Type": "applica
     else if(method==="GET"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                 });
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
@@ -32,7 +40,7 @@ export default function Fetch(url,method="GET",headers={"Content-Type": "applica
     else if(method==="PUT"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                     body: JSON.stringify(Body),
@@ -40,19 +48,27 @@ export default function Fetch(url,method="GET",headers={"Content-Type": "applica
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();
     }else if(method==="DELETE"){
         const sendPostRequest = async () => {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(project_url+endpoint +Query, {
                     method: method,
                     headers: headers,
                 });
                 return {"result":await response.json().catch(() => ({})),"status":response.status};
             } catch (err) {
                 console.log(err);
+                return {
+                    status: 500,
+                    result: { code: "ERROR" }
+                };
             }
         }
         return sendPostRequest();

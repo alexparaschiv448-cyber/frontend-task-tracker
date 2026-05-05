@@ -1,6 +1,7 @@
 import '../index.css'
 import PageLayout from "../components/PageLayout";
-import RegisterForm from "../components/RegisterForm";
+import ProjectForm from "../components/ProjectForm.jsx";
+import ProjectTasks from "../components/ProjectTasks.jsx";
 import {useContext, useEffect} from "react";
 import {context} from "../components/Context.jsx";
 import {useLocation} from "react-router-dom";
@@ -18,8 +19,9 @@ export default function Register() {
     }, []);
     return(
         <>
-            <PageLayout>
-            <RegisterForm />
+            <PageLayout minHeight={"min-h-[2000px]"}>
+            <ProjectForm mode={"edit"} />
+            <ProjectTasks />
             </PageLayout>
         </>
     )
